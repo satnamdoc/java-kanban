@@ -2,10 +2,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TaskManager {
-    HashMap<Integer, Task> tasks;
-    HashMap<Integer, Epic> epics;
-    HashMap<Integer, SubTask> subTasks;
-
+    private final HashMap<Integer, Task> tasks;
+    private final HashMap<Integer, Epic> epics;
+    private final HashMap<Integer, SubTask> subTasks;
 
     private int lastId;
     private static final int START_ID = 100;
