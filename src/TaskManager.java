@@ -62,7 +62,6 @@ public class TaskManager {
         subTask.setId(id);
         subTasks.put(id, subTask);
         epics.get(subTask.getEpicId()).addSubTask(id);
-
         return id;
     }
 
@@ -71,7 +70,6 @@ public class TaskManager {
         if (!tasks.containsKey(id)) {
             return false;
         }
-
         tasks.put(id, task);
         return true;
     }
@@ -83,10 +81,8 @@ public class TaskManager {
             || !isEpicValid(epic)) {                          // проверка целостности структуры эпик-подзадачи
             return false;
         }
-
         epics.put(id, epic);
         updateEpicStatus(id);   // статус эпика может измениться
-
         return true;
     }
 
@@ -95,7 +91,6 @@ public class TaskManager {
         if (!subTasks.containsKey(id) || !isSubTaskValid(subTask)) {
             return false;
         }
-
         subTasks.put(id, subTask);
         updateEpicStatus(subTask.getEpicId());
         return true;
@@ -123,7 +118,6 @@ public class TaskManager {
         for (int subTaskId : epics.get(epicId).getSubTaskIds()) {
             subTasksOfEpic.add(subTasks.get(subTaskId));
         }
-
         return  subTasksOfEpic;
     }
 
@@ -182,7 +176,6 @@ public class TaskManager {
             subTasks.remove(id);
             return true;
         }
-
         return false;
     }
 
