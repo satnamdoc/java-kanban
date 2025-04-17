@@ -1,3 +1,4 @@
+package ru.yandex.practicum.taskmanagerapp.core;
 
 public class SubTask extends Task{
     private int epicId;

@@ -1,11 +1,12 @@
+package ru.yandex.practicum.taskmanagerapp.core;
+
 import java.util.ArrayList;
 
 public class Epic extends Task {
-    ArrayList<Integer> subTaskIds;
+    private final ArrayList<Integer> subTaskIds  = new ArrayList<>();;
 
     public Epic(String name, String description) {
         super(name, description);
-        subTaskIds = new ArrayList<>();
     }
 
     public void addSubTask(int subTaskId) {
@@ -21,7 +22,7 @@ public class Epic extends Task {
     }
 
     public ArrayList<Integer> getSubTaskIds() {
-        return subTaskIds;
+        return new ArrayList<>(subTaskIds);
     }
 
     @Override

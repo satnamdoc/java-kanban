@@ -1,3 +1,6 @@
+import ru.yandex.practicum.taskmanagerapp.TaskManager;
+import ru.yandex.practicum.taskmanagerapp.core.*;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -5,6 +8,7 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println("Поехали!");
+
 
         TaskManager taskManager = new TaskManager();
         testInitTaskManager(taskManager);
@@ -27,10 +31,10 @@ public class Main {
 
         rndInt = rnd.nextInt(10) + 1;
         for (int i = 0; i < rndInt; i++) {
-            int epicId = taskManager.addTask(new Epic("Epic #" + i, "test epic #" + i));
+            int epicId = taskManager.addEpic(new Epic("Epic #" + i, "test epic #" + i));
             int rndInt_ = rnd.nextInt(10) + 1;
             for (int j = 0; j < rndInt_; j++) {
-                taskManager.addTask(new SubTask("Subtask #" + j, "subtask #" + j
+                taskManager.addSubTask(new SubTask("Subtask #" + j, "subtask #" + j
                         + " for epic #" + i, epicId));
             }
         }
@@ -79,13 +83,13 @@ public class Main {
 
         ArrayList<Epic> epics = taskManager.getEpicList();
         id = epics.get(rnd.nextInt(epics.size())).getId();
-        taskManager.removeTask(id);
+        taskManager.removeEpic(id);
         System.out.println("--after " + id + " removal--");
         taskManager.printStatuses();
 
         ArrayList<SubTask> subTasks = taskManager.getSubTaskList();
         id = subTasks.get(rnd.nextInt(subTasks.size())).getId();
-        taskManager.removeTask(id);
+        taskManager.removeSubTask(id);
         System.out.println("--after " + id + " removal--");
         taskManager.printStatuses();
 
@@ -106,7 +110,7 @@ public class Main {
         taskManager.printStatuses();
     }
 
-    // тестирование TaskManager.updateTask с учетом изменения статусов и целостности внутренних связей
+    // тестирование ru.yandex.practicum.taskmanagerapp.TaskManager.updateTask с учетом изменения статусов и целостности внутренних связей
     public static void testUpdateFuncs(TaskManager taskManager) {
         System.out.println("--update functions tests--");
         
@@ -143,13 +147,13 @@ public class Main {
         Epic oldEpic = epics.get(rnd.nextInt(epics.size()));
         Epic newEpic = new Epic("*Updated*" + oldEpic.getName(), "*Updated*" + oldEpic.getDescription());
         newEpic.setId(oldEpic.getId());
-        if(taskManager.updateTask(newEpic)) {
+        if(taskManager.updateEpic(newEpic)) {
             System.out.println("--epic #" + oldEpic.getId() + " has been updated--");
         }
         newEpic = new Epic("*Updated*" + oldEpic.getName(), "*Updated*" + oldEpic.getDescription());
         newEpic.setId(oldEpic.getId());
         newEpic.setStatus(TaskStatus.DONE);                                        // запрещено менять статус эпика
-        if(taskManager.updateTask(newEpic)) {
+        if(taskManager.updateEpic(newEpic)) {
             System.out.println("--epic #" + oldEpic.getId() + " has been updated--");
         }
         for (Epic epic : taskManager.getEpicList()) {
@@ -166,7 +170,7 @@ public class Main {
             "*Updated*" + oldSubTask.getDescription(), oldSubTask.getEpicId());
         newSubTask.setId(oldSubTask.getId());
         newSubTask.setStatus(TaskStatus.IN_PROGRESS);
-        if(taskManager.updateTask(newSubTask)) {
+        if(taskManager.updateSubTask(newSubTask)) {
             System.out.println("--subtask #" + oldSubTask.getId() + " has been updated--");
         }
         subTasks = taskManager.getSubTaskList();
@@ -177,10 +181,9 @@ public class Main {
 
 
         epics = taskManager.getEpicList();
-        subTasks = taskManager.getSubTaskList();
         Epic epic = epics.get(rnd.nextInt(epics.size()));
         for (Integer subTaskId : epic.getSubTaskIds()) {
-            oldSubTask = (SubTask)taskManager.getTask(subTaskId);
+            oldSubTask = (SubTask)taskManager.getSubTask(subTaskId);
             newSubTask = new SubTask("*Updated*" + oldSubTask.getName(),
                     "*Updated*" + oldSubTask.getDescription(), oldSubTask.getEpicId());
             newSubTask.setId(oldSubTask.getId());

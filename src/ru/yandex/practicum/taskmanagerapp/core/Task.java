@@ -1,3 +1,5 @@
+package ru.yandex.practicum.taskmanagerapp.core;
+
 import java.util.Objects;
 
 public class Task {

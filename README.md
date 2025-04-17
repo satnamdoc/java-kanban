@@ -1,2 +1,2 @@
-# Task Manager Application
+# ru.yandex.practicum.taskmanagerapp.core.Task Manager Application
 
