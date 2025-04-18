@@ -1,14 +1,14 @@
-import ru.yandex.practicum.taskmanagerapp.TaskManager;
-import ru.yandex.practicum.taskmanagerapp.core.*;
+import ru.yandex.practicum.taskmanagerapp.taskmanager.TaskManager;
+import ru.yandex.practicum.taskmanagerapp.task.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class Main {
 
     public static void main(String[] args) {
         System.out.println("Поехали!");
-
 
         TaskManager taskManager = new TaskManager();
         testInitTaskManager(taskManager);
@@ -110,7 +110,7 @@ public class Main {
         taskManager.printStatuses();
     }
 
-    // тестирование ru.yandex.practicum.taskmanagerapp.TaskManager.updateTask с учетом изменения статусов и целостности внутренних связей
+    // тестирование ru.yandex.practicum.taskmanagerapp.taskmanager.TaskManager.updateTask с учетом изменения статусов и целостности внутренних связей
     public static void testUpdateFuncs(TaskManager taskManager) {
         System.out.println("--update functions tests--");
         

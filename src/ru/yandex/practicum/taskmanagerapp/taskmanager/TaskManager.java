@@ -1,6 +1,6 @@
-package ru.yandex.practicum.taskmanagerapp;
+package ru.yandex.practicum.taskmanagerapp.taskmanager;
 
-import ru.yandex.practicum.taskmanagerapp.core.*;
+import ru.yandex.practicum.taskmanagerapp.task.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,8 +12,6 @@ public class TaskManager {
 
     private static final int START_ID = 100;
     private int lastId = START_ID;
-
-    public TaskManager() {}
 
     private int generateId() {
         return lastId++;
@@ -58,12 +56,11 @@ public class TaskManager {
         if (task == null) {
             return false;
         }
-        int id = task.getId();
-        if (!tasks.containsKey(id)) {   // как здесь использовать putIfAbsent не придумал (,
-            return false;               // скорее нужно что-то типа putIfNotAbsent
+        if (tasks.replace(task.getId(), task) == null) {
+            return false;
+        } else {
+            return true;
         }
-        tasks.put(id, task);
-        return true;
     }
 
     public boolean updateEpic(Epic epic) {
@@ -84,11 +81,9 @@ public class TaskManager {
         if (subTask == null) {
             return false;
         }
-        int id = subTask.getId();
-        if (!subTasks.containsKey(id)) {
+        if (subTasks.replace(subTask.getId(), subTask) == null) {
             return false;
         }
-        subTasks.put(id, subTask);
         updateEpicStatus(subTask.getEpicId());
         return true;
     }
@@ -155,11 +150,11 @@ public class TaskManager {
     }
 
     public boolean removeTask(int id) {
-        if (tasks.containsKey(id)) {
-            tasks.remove(id);
+        if (tasks.remove(id) != null) {
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
     public boolean removeEpic(int id) {

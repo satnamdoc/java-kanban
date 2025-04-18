@@ -1,4 +1,4 @@
-package ru.yandex.practicum.taskmanagerapp.core;
+package ru.yandex.practicum.taskmanagerapp.task;
 
 import java.util.Objects;
 
