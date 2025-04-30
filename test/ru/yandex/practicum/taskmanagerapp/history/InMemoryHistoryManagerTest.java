@@ -23,6 +23,7 @@ class InMemoryHistoryManagerTest {
                 "Task history should be empty after history manager initilization");
     }
 
+    @Test
     void add() {
         ArrayList<Task> taskHistory = new ArrayList<>();
 
