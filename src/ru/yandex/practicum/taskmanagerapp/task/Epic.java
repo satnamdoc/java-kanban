@@ -3,7 +3,7 @@ package ru.yandex.practicum.taskmanagerapp.task;
 import java.util.ArrayList;
 
 public class Epic extends Task {
-    private final ArrayList<Integer> subTaskIds  = new ArrayList<>();;
+    private final ArrayList<Integer> subTaskIds  = new ArrayList<>();
 
     public Epic(String name, String description) {
         super(name, description);
