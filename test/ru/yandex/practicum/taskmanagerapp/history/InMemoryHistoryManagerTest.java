@@ -144,8 +144,6 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void removeAllTasks() {
-        ArrayList<Task> taskHistory = new ArrayList<>();
-
         Task task1 = new Task("Test task #1", "description");
         Task task2 = new Task("Test task #2", "description");
 

@@ -469,6 +469,7 @@ class InMemoryTaskManagerTest {
         int epicId = inMemoryTaskManager.addEpic(new Epic("Test epic #", "description"));
         int subTaskId = inMemoryTaskManager.addSubTask(new SubTask("Test subtask #", "description", epicId));
 
+        inMemoryTaskManager.getEpic(taskId);
         history.add(inMemoryTaskManager.getEpic(epicId));
         history.add(inMemoryTaskManager.getSubTask(subTaskId));
         inMemoryTaskManager.clearTasks();

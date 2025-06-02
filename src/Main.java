@@ -10,28 +10,108 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Поехали!");
 
+        // history management tests
         TaskManager taskManager = Managers.getDefault();
+        testInitTaskManagerSprint6(taskManager);
+
+        List<Task> tasks = taskManager.getTaskList();
+        List<Epic> epics = taskManager.getEpicList();
+        List<SubTask> subTasks = taskManager.getSubTaskList();
+
+        taskManager.getTask(tasks.get(0).getId());
+        taskManager.getTask(tasks.get(1).getId());
+        taskManager.getEpic(epics.get(0).getId());
+        taskManager.getSubTask(subTasks.get(1).getId());
+        taskManager.getTask(tasks.get(0).getId());
+        taskManager.getSubTask(subTasks.get(2).getId());
+        printTaskManagerState(taskManager);
+
+        taskManager.getEpic(epics.get(1).getId());
+        taskManager.getSubTask(subTasks.get(2).getId());
+        taskManager.getSubTask(subTasks.get(0).getId());
+        taskManager.getEpic(epics.get(0).getId());
+        taskManager.getTask(tasks.get(1).getId());
+        taskManager.getSubTask(subTasks.get(1).getId());
+        taskManager.getTask(tasks.get(1).getId());
+        printTaskManagerState(taskManager);
+
+        taskManager.removeTask(tasks.get(1).getId());
+        printTaskManagerState(taskManager);
+
+        taskManager.removeEpic(epics.get(0).getId());
+        printTaskManagerState(taskManager);
+
+
+        /// /////////////////////////
         testInitTaskManager(taskManager);
         printTaskManagerState(taskManager);
 
+        // additional history manager test
+        tasks = taskManager.getTaskList();
+        epics = taskManager.getEpicList();
+        subTasks = taskManager.getSubTaskList();
+
+        taskManager.getTask(tasks.get(0).getId());
+        taskManager.getTask(tasks.get(1).getId());
+        taskManager.getEpic(epics.get(0).getId());
+        List<SubTask> epicSubTasks = taskManager.getSubTasksOfEpic(epics.get(0).getId());
+        taskManager.getSubTask(epicSubTasks.get(0).getId());
+        taskManager.getSubTask(epicSubTasks.get(1).getId());
+        taskManager.getSubTask(epicSubTasks.get(2).getId());
+        taskManager.getTask(tasks.get(0).getId());
+        printTaskManagerState(taskManager);
+
+        taskManager.removeEpic(epics.get(0).getId());
+        printTaskManagerState(taskManager);
+
+        taskManager.getEpic(epics.get(1).getId());
+        taskManager.getEpic(epics.get(2).getId());
+        taskManager.getEpic(epics.get(1).getId());
+        taskManager.getEpic(epics.get(0).getId());
+        taskManager.getTask(tasks.get(1).getId());
+        printTaskManagerState(taskManager);
+
+        taskManager.clearTasks();
+        printTaskManagerState(taskManager);
     }
 
 
-    // заполнение объекта TaskManager случайным набором данных
+    public static void testInitTaskManagerSprint6(TaskManager taskManager)
+    {
+        System.out.println("--init--");
+        taskManager.clear();
+
+        taskManager.addTask(new Task("Simple task #1" , "test task #1"));
+        taskManager.addTask(new Task("Simple task #1" , "test task #2"));
+
+        int epicId = taskManager.addEpic(new Epic("Epic #1", "test epic #1"));
+        taskManager.addEpic(new Epic("Epic #2", "test epic #2"));
+
+        taskManager.addSubTask(new SubTask("Subtask #1",
+                "subtask #1 for epic #" + epicId, epicId));
+        taskManager.addSubTask(new SubTask("Subtask #2",
+                "subtask #2 for epic #" + epicId, epicId));
+        taskManager.addSubTask(new SubTask("Subtask #3",
+                "subtask #3 for epic #" + epicId, epicId));
+
+
+    }
+
+    // fill TaskManager object with random data
     public static void testInitTaskManager(TaskManager taskManager) {
         System.out.println("--init--");
         taskManager.clear();
 
         Random rnd = new Random();
-        int rndInt = rnd.nextInt(10) + 1;
+        int rndInt = rnd.nextInt(3) + 3;
         for (int i = 0; i < rndInt; i++) {
             taskManager.addTask(new Task("Simple task #" + i, "test task #" + i));
         }
 
-        rndInt = rnd.nextInt(10) + 1;
+        rndInt = rnd.nextInt(3) + 3;
         for (int i = 0; i < rndInt; i++) {
             int epicId = taskManager.addEpic(new Epic("Epic #" + i, "test epic #" + i));
-            int rndInt_ = rnd.nextInt(10) + 1;
+            int rndInt_ = rnd.nextInt(3) + 3;
             for (int j = 0; j < rndInt_; j++) {
                 taskManager.addSubTask(new SubTask("Subtask #" + j, "subtask #" + j
                         + " for epic #" + i, epicId));
@@ -100,6 +180,7 @@ public class Main {
             }
         }
         System.out.println("]");
+
 
         System.out.println("History");
         List<Task> history = taskManager.getHistory();

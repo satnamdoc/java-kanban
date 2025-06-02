@@ -10,7 +10,7 @@ import java.util.Map;
 public class InMemoryHistoryManager implements HistoryManager {
 
     private class Node {
-        private Task task;
+        private final Task task;
         private Node prev;
         private Node next;
 
