@@ -76,13 +76,12 @@ public class Main {
     }
 
 
-    public static void testInitTaskManagerSprint6(TaskManager taskManager)
-    {
+    public static void testInitTaskManagerSprint6(TaskManager taskManager) {
         System.out.println("--init--");
         taskManager.clear();
 
-        taskManager.addTask(new Task("Simple task #1" , "test task #1"));
-        taskManager.addTask(new Task("Simple task #1" , "test task #2"));
+        taskManager.addTask(new Task("Simple task #1", "test task #1"));
+        taskManager.addTask(new Task("Simple task #1", "test task #2"));
 
         int epicId = taskManager.addEpic(new Epic("Epic #1", "test epic #1"));
         taskManager.addEpic(new Epic("Epic #2", "test epic #2"));
@@ -111,8 +110,8 @@ public class Main {
         rndInt = rnd.nextInt(3) + 3;
         for (int i = 0; i < rndInt; i++) {
             int epicId = taskManager.addEpic(new Epic("Epic #" + i, "test epic #" + i));
-            int rndInt_ = rnd.nextInt(3) + 3;
-            for (int j = 0; j < rndInt_; j++) {
+            int rndInt1 = rnd.nextInt(3) + 3;
+            for (int j = 0; j < rndInt1; j++) {
                 taskManager.addSubTask(new SubTask("Subtask #" + j, "subtask #" + j
                         + " for epic #" + i, epicId));
             }
@@ -150,8 +149,7 @@ public class Main {
         System.out.println("Subtasks");
         if (epics.isEmpty()) {
             System.out.println("[]");
-        }
-        else {
+        } else {
             System.out.print("[");
         }
         for (Epic epic : epics) {
@@ -186,8 +184,7 @@ public class Main {
         List<Task> history = taskManager.getHistory();
         if (history.isEmpty()) {
             System.out.println("[]");
-        }
-        else {
+        } else {
             System.out.print("[" + history.getFirst().getId());
             for (int i = 1; i < history.size(); i++) {
                 System.out.print(", " + history.get(i).getId());
