@@ -65,13 +65,11 @@ public class InMemoryHistoryManager implements HistoryManager {
             if (head == null) { //удаление последнего узла
                 tail = null;
             }
-        }
-        else {
+        } else {
             node.getPrev().setNext(node.getNext());
             if (node == tail) {
                 tail = node.prev;
-            }
-            else {
+            } else {
                 node.getNext().setPrev(node.getPrev());
             }
         }
@@ -79,7 +77,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     private List<Task> getTasks() {
         List<Task> tasks = new ArrayList<>(listSize);
-        if(listSize == 0){
+        if (listSize == 0) {
             return tasks;
         }
 
@@ -93,7 +91,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void add(Task task){
+    public void add(Task task) {
         if (task == null) {
             return;
         }
@@ -108,7 +106,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public List<Task> getHistory(){
+    public List<Task> getHistory() {
         return getTasks();
     }
 }
