@@ -233,8 +233,8 @@ public class InMemoryTaskManager implements TaskManager {
             // Если есть хоть одна подзадача со статусом отличным от NEW,
             if (subTasks.get(subTaskId).getStatus() != TaskStatus.NEW) {
                 // то проверяем есть ли подзадачи со статусом отличным от DONE
-                for (int $subTaskId : epic.getSubTaskIds()) {
-                    if (subTasks.get($subTaskId).getStatus() != TaskStatus.DONE) {
+                for (int subTaskId$ : epic.getSubTaskIds()) {
+                    if (subTasks.get(subTaskId$).getStatus() != TaskStatus.DONE) {
                         epic.setStatus(TaskStatus.IN_PROGRESS);
                         return;
                     }
