@@ -2,10 +2,7 @@ package ru.yandex.practicum.taskmanagerapp.history;
 
 import ru.yandex.practicum.taskmanagerapp.task.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
@@ -18,6 +15,18 @@ public class InMemoryHistoryManager implements HistoryManager {
             this.task = task;
             this.prev = prev;       // Согласно тз список
             this.next = next;       // должен быть двухсвязанным
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+            Node node = (Node) o;
+            return Objects.equals(task, node.task) && Objects.equals(prev, node.prev) && Objects.equals(next, node.next);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(task, prev, next);
         }
 
         public Node getPrev() {
@@ -60,14 +69,14 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
 
         listSize--;
-        if (node == head) {
+        if (node.equals(head)) {
             head = node.getNext();
             if (head == null) { //удаление последнего узла
                 tail = null;
             }
         } else {
             node.getPrev().setNext(node.getNext());
-            if (node == tail) {
+            if (node.equals(tail)) {
                 tail = node.prev;
             } else {
                 node.getNext().setPrev(node.getPrev());
@@ -77,9 +86,6 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     private List<Task> getTasks() {
         List<Task> tasks = new ArrayList<>(listSize);
-        if (listSize == 0) {
-            return tasks;
-        }
 
         Node node = head;
         while (node != null) {
