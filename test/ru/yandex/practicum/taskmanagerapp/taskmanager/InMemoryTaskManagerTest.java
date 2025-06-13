@@ -427,4 +427,60 @@ class InMemoryTaskManagerTest {
 
         assertEquals(history, inMemoryTaskManager.getHistory(), "Task history mismatch");
     }
+
+    @Test
+    public void souldUpdateHistoryAfterTaskRemoval() {
+        int taskId = inMemoryTaskManager.addTask(new Task("Test task #", "description"));
+        inMemoryTaskManager.getTask(taskId);
+        inMemoryTaskManager.removeTask(taskId);
+
+        assertTrue(inMemoryTaskManager.getHistory().isEmpty(),
+                "All tasks should be deleted from history");
+    }
+
+    @Test
+    public void souldUpdateHistoryAfterEpicRemoval() {
+        int epicId = inMemoryTaskManager.addEpic(new Epic("Test epic #", "description"));
+        int subTaskId = inMemoryTaskManager.addSubTask(new SubTask("Test subtask #", "description", epicId));
+
+        inMemoryTaskManager.getEpic(epicId);
+        inMemoryTaskManager.getSubTask(subTaskId);
+        inMemoryTaskManager.removeEpic(epicId);
+        assertTrue(inMemoryTaskManager.getHistory().isEmpty(),
+                "All tasks should be deleted from history");
+    }
+
+    @Test
+    public void souldUpdateHistoryAfterSubtaskRemoval() {
+        int epicId = inMemoryTaskManager.addEpic(new Epic("Test epic #", "description"));
+        int subTaskId = inMemoryTaskManager.addSubTask(new SubTask("Test subtask #", "description", epicId));
+
+        inMemoryTaskManager.getSubTask(subTaskId);
+        inMemoryTaskManager.removeSubTask(subTaskId);
+        assertTrue(inMemoryTaskManager.getHistory().isEmpty(),
+                "All tasks should be deleted from history");
+    }
+
+    @Test
+    public void souldUpdateHistoryAfterTasksClearing() {
+        ArrayList<Task> history = new ArrayList<>();
+
+        int taskId = inMemoryTaskManager.addTask(new Task("Test task #", "description"));
+        int epicId = inMemoryTaskManager.addEpic(new Epic("Test epic #", "description"));
+        int subTaskId = inMemoryTaskManager.addSubTask(new SubTask("Test subtask #", "description", epicId));
+
+        inMemoryTaskManager.getEpic(taskId);
+        history.add(inMemoryTaskManager.getEpic(epicId));
+        history.add(inMemoryTaskManager.getSubTask(subTaskId));
+        inMemoryTaskManager.clearTasks();
+        assertEquals(history, inMemoryTaskManager.getHistory(), "Task history mismatch");
+
+        history.clear();
+        history.add(inMemoryTaskManager.getEpic(epicId));
+        inMemoryTaskManager.clearSubTasks();
+        assertEquals(history, inMemoryTaskManager.getHistory(), "Task history mismatch");
+
+        inMemoryTaskManager.clearEpics();
+        assertTrue(inMemoryTaskManager.getHistory().isEmpty(), "Task history mismatch");
+    }
 }
