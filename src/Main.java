@@ -1,7 +1,9 @@
 import ru.yandex.practicum.taskmanagerapp.taskmanager.Managers;
 import ru.yandex.practicum.taskmanagerapp.taskmanager.TaskManager;
+import ru.yandex.practicum.taskmanagerapp.taskmanager.FileBackedTaskManager;
 import ru.yandex.practicum.taskmanagerapp.task.*;
 
+import java.io.File;
 import java.util.List;
 import java.util.Random;
 
@@ -10,71 +12,15 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Поехали!");
 
-        // history management tests
-        TaskManager taskManager = Managers.getDefault();
-        testInitTaskManagerSprint6(taskManager);
+        File file = new File("data.csv");
+        TaskManager taskManager = new FileBackedTaskManager(file, Managers.getDefaultHistory());
 
-        List<Task> tasks = taskManager.getTaskList();
-        List<Epic> epics = taskManager.getEpicList();
-        List<SubTask> subTasks = taskManager.getSubTaskList();
-
-        taskManager.getTask(tasks.get(0).getId());
-        taskManager.getTask(tasks.get(1).getId());
-        taskManager.getEpic(epics.get(0).getId());
-        taskManager.getSubTask(subTasks.get(1).getId());
-        taskManager.getTask(tasks.get(0).getId());
-        taskManager.getSubTask(subTasks.get(2).getId());
-        printTaskManagerState(taskManager);
-
-        taskManager.getEpic(epics.get(1).getId());
-        taskManager.getSubTask(subTasks.get(2).getId());
-        taskManager.getSubTask(subTasks.get(0).getId());
-        taskManager.getEpic(epics.get(0).getId());
-        taskManager.getTask(tasks.get(1).getId());
-        taskManager.getSubTask(subTasks.get(1).getId());
-        taskManager.getTask(tasks.get(1).getId());
-        printTaskManagerState(taskManager);
-
-        taskManager.removeTask(tasks.get(1).getId());
-        printTaskManagerState(taskManager);
-
-        taskManager.removeEpic(epics.get(0).getId());
-        printTaskManagerState(taskManager);
-
-
-        /// /////////////////////////
         testInitTaskManager(taskManager);
         printTaskManagerState(taskManager);
 
-        // additional history manager test
-        tasks = taskManager.getTaskList();
-        epics = taskManager.getEpicList();
-        subTasks = taskManager.getSubTaskList();
-
-        taskManager.getTask(tasks.get(0).getId());
-        taskManager.getTask(tasks.get(1).getId());
-        taskManager.getEpic(epics.get(0).getId());
-        List<SubTask> epicSubTasks = taskManager.getSubTasksOfEpic(epics.get(0).getId());
-        taskManager.getSubTask(epicSubTasks.get(0).getId());
-        taskManager.getSubTask(epicSubTasks.get(1).getId());
-        taskManager.getSubTask(epicSubTasks.get(2).getId());
-        taskManager.getTask(tasks.get(0).getId());
-        printTaskManagerState(taskManager);
-
-        taskManager.removeEpic(epics.get(0).getId());
-        printTaskManagerState(taskManager);
-
-        taskManager.getEpic(epics.get(1).getId());
-        taskManager.getEpic(epics.get(2).getId());
-        taskManager.getEpic(epics.get(1).getId());
-        taskManager.getEpic(epics.get(0).getId());
-        taskManager.getTask(tasks.get(1).getId());
-        printTaskManagerState(taskManager);
-
-        taskManager.clearTasks();
-        printTaskManagerState(taskManager);
+        FileBackedTaskManager tm = FileBackedTaskManager.loadFromFile(file);
+        printTaskManagerState(tm);
     }
-
 
     public static void testInitTaskManagerSprint6(TaskManager taskManager) {
         System.out.println("--init--");
@@ -178,7 +124,6 @@ public class Main {
             }
         }
         System.out.println("]");
-
 
         System.out.println("History");
         List<Task> history = taskManager.getHistory();

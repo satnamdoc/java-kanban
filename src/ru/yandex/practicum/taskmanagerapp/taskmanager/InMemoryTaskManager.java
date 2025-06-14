@@ -251,4 +251,17 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Task> getHistory() {
         return historyManager.getHistory();
     }
+
+    protected void load(List<Task> tasks, List<Epic> epics, List<SubTask> subTasks) {
+        clear();
+        for (Task task : tasks) {
+            this.tasks.put(task.getId(), task);
+        }
+        for (Epic epic : epics) {
+            this.epics.put(epic.getId(), epic);
+        }
+        for (SubTask subTask : subTasks) {
+            this.subTasks.put(subTask.getId(), subTask);
+        }
+    }
 }
