@@ -11,14 +11,11 @@ import ru.yandex.practicum.taskmanagerapp.task.TaskStatus;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
-
     private File dataFile;
-    static private final String CSVFILE_HEADER = "id,type,name,status,description,epic";
-
+    private static final String CSVFILE_HEADER = "id,type,name,status,description,epic";
 
     public FileBackedTaskManager(File dataFile, HistoryManager historyManager) {
         super(historyManager);
@@ -64,16 +61,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         );
     }
 
-    private void  save()  {
+    private void save() {
         try (FileWriter fw = new FileWriter(dataFile); BufferedWriter writer = new BufferedWriter(fw)) {
             writer.write(CSVFILE_HEADER + "\n");
-            for(Task task :  super.getTaskList()) {
+            for (Task task : super.getTaskList()) {
                 writer.write(toCSVString(task) + "\n");
             }
-            for(Epic epic :  super.getEpicList()) {
+            for (Epic epic : super.getEpicList()) {
                 writer.write(toCSVString(epic) + "\n");
             }
-            for(SubTask subTask :  super.getSubTaskList()) {
+            for (SubTask subTask : super.getSubTaskList()) {
                 writer.write(toCSVString(subTask) + "\n");
             }
         } catch (IOException e) {
@@ -143,7 +140,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         if (id != Task.NULL_ID) {
             save();
         }
-        return  id;
+        return id;
     }
 
     @Override
@@ -265,8 +262,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         TaskManager tm2 = FileBackedTaskManager.loadFromFile(file);
         if (tm1.getTaskList().equals(tm2.getTaskList())
-            && tm1.getEpicList().equals(tm2.getEpicList())
-            && tm1.getSubTaskList().equals(tm2.getSubTaskList())) {
+                && tm1.getEpicList().equals(tm2.getEpicList())
+                && tm1.getSubTaskList().equals(tm2.getSubTaskList())) {
             System.out.println("file backed task manager works fine");
         } else {
             System.out.println("file backed task manager should be fixed");
