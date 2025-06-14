@@ -81,7 +81,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private static Task fromCSVString(String str) {
         Task task = null;
         //"id,type,name,status,description,epic"
-        String fields[] = str.split(",");
+        String[] fields = str.split(",");
 
         switch (TaskType.valueOf(fields[1])) {
             case TaskType.TASK:
