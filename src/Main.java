@@ -11,15 +11,7 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println("Поехали!");
-
-        File file = new File("data.csv");
-        TaskManager taskManager = new FileBackedTaskManager(file, Managers.getDefaultHistory());
-
-        testInitTaskManager(taskManager);
-        printTaskManagerState(taskManager);
-
-        FileBackedTaskManager tm = FileBackedTaskManager.loadFromFile(file);
-        printTaskManagerState(tm);
+        FileBackedTaskManager.main(null);
     }
 
     public static void testInitTaskManagerSprint6(TaskManager taskManager) {
@@ -38,8 +30,6 @@ public class Main {
                 "subtask #2 for epic #" + epicId, epicId));
         taskManager.addSubTask(new SubTask("Subtask #3",
                 "subtask #3 for epic #" + epicId, epicId));
-
-
     }
 
     // fill TaskManager object with random data

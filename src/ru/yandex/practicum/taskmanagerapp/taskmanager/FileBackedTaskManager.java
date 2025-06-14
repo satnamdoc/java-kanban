@@ -12,6 +12,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -240,5 +241,35 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             save();
         }
         return res;
+    }
+
+    public static void main(String[] args) {
+        File file = new File("data.csv");
+        TaskManager tm1 = new FileBackedTaskManager(file, Managers.getDefaultHistory());
+
+        Random rnd = new Random();
+        int rndInt = rnd.nextInt(3) + 3;
+        for (int i = 0; i < rndInt; i++) {
+            tm1.addTask(new Task("Simple task #" + i, "test task #" + i));
+        }
+
+        rndInt = rnd.nextInt(3) + 3;
+        for (int i = 0; i < rndInt; i++) {
+            int epicId = tm1.addEpic(new Epic("Epic #" + i, "test epic #" + i));
+            int rndInt1 = rnd.nextInt(3) + 3;
+            for (int j = 0; j < rndInt1; j++) {
+                tm1.addSubTask(new SubTask("Subtask #" + j, "subtask #" + j
+                        + " for epic #" + i, epicId));
+            }
+        }
+
+        TaskManager tm2 = FileBackedTaskManager.loadFromFile(file);
+        if (tm1.getTaskList().equals(tm2.getTaskList())
+            && tm1.getEpicList().equals(tm2.getEpicList())
+            && tm1.getSubTaskList().equals(tm2.getSubTaskList())) {
+            System.out.println("file backed task manager works fine");
+        } else {
+            System.out.println("file backed task manager should be fixed");
+        }
     }
 }
