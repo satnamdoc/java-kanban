@@ -1,7 +1,5 @@
 package ru.yandex.practicum.taskmanagerapp.task;
 
-import ru.yandex.practicum.taskmanagerapp.taskmanager.FileBackedTaskManager;
-
 import java.util.Objects;
 
 public class Task {
