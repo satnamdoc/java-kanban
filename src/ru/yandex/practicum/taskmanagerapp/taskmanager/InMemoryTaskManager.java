@@ -1,5 +1,6 @@
 package ru.yandex.practicum.taskmanagerapp.taskmanager;
 
+import ru.yandex.practicum.taskmanagerapp.exception.ManagerLoadException;
 import ru.yandex.practicum.taskmanagerapp.history.HistoryManager;
 import ru.yandex.practicum.taskmanagerapp.task.Epic;
 import ru.yandex.practicum.taskmanagerapp.task.SubTask;
@@ -250,5 +251,27 @@ public class InMemoryTaskManager implements TaskManager {
 
     public List<Task> getHistory() {
         return historyManager.getHistory();
+    }
+
+    protected void load(List<Task> tasks, List<Epic> epics, List<SubTask> subTasks) {
+        if (lastId != START_ID) {
+            throw new ManagerLoadException("Task manager object must be empty");
+        }
+
+        for (Task task : tasks) {
+            int id = task.getId();
+            lastId = Math.max(lastId, id);
+            this.tasks.put(id, task);
+        }
+        for (Epic epic : epics) {
+            int id = epic.getId();
+            lastId = Math.max(lastId, id);
+            this.epics.put(id, epic);
+        }
+        for (SubTask subTask : subTasks) {
+            int id = subTask.getId();
+            lastId = Math.max(lastId, id);
+            this.subTasks.put(id, subTask);
+        }
     }
 }

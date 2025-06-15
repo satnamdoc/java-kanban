@@ -8,6 +8,12 @@ public class SubTask extends Task {
         this.epicId = epicId;
     }
 
+    public SubTask(int id, String name, String description, TaskStatus status, int epicId) {
+        super(id, name, description, status);
+        this.epicId = epicId;
+    }
+
+
     public int getEpicId() {
         return epicId;
     }
@@ -26,4 +32,17 @@ public class SubTask extends Task {
                 ", epicId=" + epicId +
                 '}';
     }
+
+    @Override
+    public String toCSVString() {
+        return String.join(",",
+                Integer.toString(getId()),
+                TaskType.SUBTASK.toString(),
+                getStatus().toString(),
+                getName(),
+                getDescription(),
+                Integer.toString(getEpicId())
+        );
+    }
+
 }

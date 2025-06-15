@@ -17,6 +17,14 @@ public class Task {
         this.status = TaskStatus.NEW;
     }
 
+    public Task(int id, String name, String description, TaskStatus status) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.status = status;
+    }
+
+
     public int getId() {
         return id;
     }
@@ -70,5 +78,16 @@ public class Task {
                 ", status=" + status +
                 ", description length=" + description.length() +
                 '}';
+    }
+
+    public String toCSVString() {
+        return String.join(",",
+                Integer.toString(getId()),
+                TaskType.TASK.toString(),
+                getStatus().toString(),
+                getName(),
+                getDescription(),
+                ""
+        );
     }
 }
