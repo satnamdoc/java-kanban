@@ -1,6 +1,5 @@
 package ru.yandex.practicum.taskmanagerapp.taskmanager;
 
-import ru.yandex.practicum.taskmanagerapp.exception.ManagerException;
 import ru.yandex.practicum.taskmanagerapp.exception.ManagerLoadException;
 import ru.yandex.practicum.taskmanagerapp.history.HistoryManager;
 import ru.yandex.practicum.taskmanagerapp.task.Epic;
