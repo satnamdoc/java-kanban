@@ -39,4 +39,16 @@ public class Epic extends Task {
                 ", subTaskIds=" + subTaskIds +
                 '}';
     }
+
+    @Override
+    public String toCSVString() {
+        return String.join(",",
+                Integer.toString(getId()),
+                TaskType.EPIC.toString(),
+                getStatus().toString(),
+                getName(),
+                getDescription(),
+                ""
+        );
+    }
 }

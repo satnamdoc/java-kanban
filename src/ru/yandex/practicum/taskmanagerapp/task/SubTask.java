@@ -32,4 +32,17 @@ public class SubTask extends Task {
                 ", epicId=" + epicId +
                 '}';
     }
+
+    @Override
+    public String toCSVString() {
+        return String.join(",",
+                Integer.toString(getId()),
+                TaskType.SUBTASK.toString(),
+                getStatus().toString(),
+                getName(),
+                getDescription(),
+                Integer.toString(getEpicId())
+        );
+    }
+
 }

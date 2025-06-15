@@ -8,6 +8,7 @@ import ru.yandex.practicum.taskmanagerapp.task.Task;
 import ru.yandex.practicum.taskmanagerapp.task.TaskStatus;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -22,25 +23,17 @@ class FileBackedTaskManagerTest {
     private static final String CSVFILE_HEADER = "id,type,name,status,description,epic";
 
     @BeforeEach
-    public void beforeEach() {
-        try {
+    public void beforeEach()  throws IOException {
             tempFile = File.createTempFile("testtmdata", ".tmp");
             tempFile.deleteOnExit();
             fileBackedTaskManager = new FileBackedTaskManager(tempFile, Managers.getDefaultHistory());
             fileBackedTaskManager.clear();  // trigger file saving
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Test
-    void saveEmptyTaskManager() {
-        try {
-            String fileData = Files.readString(Paths.get(tempFile.getAbsolutePath()));
-            assertEquals(CSVFILE_HEADER + "\n", fileData, "Data file should contain CVS header");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    void saveEmptyTaskManager() throws IOException {
+        String fileData = Files.readString(Paths.get(tempFile.getAbsolutePath()));
+        assertEquals(CSVFILE_HEADER + "\n", fileData, "Data file should contain CVS header");
     }
 
     @Test
@@ -53,22 +46,17 @@ class FileBackedTaskManagerTest {
 
 
     @Test
-    void saveTaskManagerToDataFile() {
+    void saveTaskManagerToDataFile() throws IOException {
         int taskId = fileBackedTaskManager.addTask(new Task("Test task", "description"));
         int epicId = fileBackedTaskManager.addEpic(new Epic("Test epic", "description"));
         int subTaskId = fileBackedTaskManager.addSubTask(new SubTask("Test subtask", "description", epicId));
 
-        String fileData =
-                CSVFILE_HEADER + "\n" +
-                        taskId + ",TASK,NEW,Test task,description,\n" +
-                        epicId + ",EPIC,NEW,Test epic,description,\n" +
-                        subTaskId + ",SUBTASK,NEW,Test subtask,description," + epicId + "\n";
-        try {
-            assertEquals(fileData, Files.readString(Paths.get(tempFile.getAbsolutePath())),
+        String fileData = CSVFILE_HEADER + "\n" +
+                taskId + ",TASK,NEW,Test task,description,\n" +
+                epicId + ",EPIC,NEW,Test epic,description,\n" +
+                subTaskId + ",SUBTASK,NEW,Test subtask,description," + epicId + "\n";
+        assertEquals(fileData, Files.readString(Paths.get(tempFile.getAbsolutePath())),
                     "Data file corruption");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Test

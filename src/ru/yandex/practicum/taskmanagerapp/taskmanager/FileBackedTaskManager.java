@@ -3,10 +3,7 @@ package ru.yandex.practicum.taskmanagerapp.taskmanager;
 import ru.yandex.practicum.taskmanagerapp.exception.ManagerLoadException;
 import ru.yandex.practicum.taskmanagerapp.exception.ManagerSaveException;
 import ru.yandex.practicum.taskmanagerapp.history.HistoryManager;
-import ru.yandex.practicum.taskmanagerapp.task.Epic;
-import ru.yandex.practicum.taskmanagerapp.task.SubTask;
-import ru.yandex.practicum.taskmanagerapp.task.Task;
-import ru.yandex.practicum.taskmanagerapp.task.TaskStatus;
+import ru.yandex.practicum.taskmanagerapp.task.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -22,56 +19,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.dataFile = dataFile;
     }
 
-    private enum TaskType {
-        TASK,
-        EPIC,
-        SUBTASK
-    }
-
-    private String toCSVString(Task task) {
-        return String.join(",",
-                Integer.toString(task.getId()),
-                TaskType.TASK.toString(),
-                task.getStatus().toString(),
-                task.getName(),
-                task.getDescription(),
-                ""
-        );
-    }
-
-    private String toCSVString(Epic epic) {
-        return String.join(",",
-                Integer.toString(epic.getId()),
-                TaskType.EPIC.toString(),
-                epic.getStatus().toString(),
-                epic.getName(),
-                epic.getDescription(),
-                ""
-        );
-    }
-
-    private String toCSVString(SubTask subTask) {
-        return String.join(",",
-                Integer.toString(subTask.getId()),
-                TaskType.SUBTASK.toString(),
-                subTask.getStatus().toString(),
-                subTask.getName(),
-                subTask.getDescription(),
-                Integer.toString(subTask.getEpicId())
-        );
-    }
-
     private void save() {
         try (FileWriter fw = new FileWriter(dataFile); BufferedWriter writer = new BufferedWriter(fw)) {
             writer.write(CSVFILE_HEADER + "\n");
             for (Task task : super.getTaskList()) {
-                writer.write(toCSVString(task) + "\n");
+                writer.write(task.toCSVString() + "\n");
             }
             for (Epic epic : super.getEpicList()) {
-                writer.write(toCSVString(epic) + "\n");
+                writer.write(epic.toCSVString() + "\n");
             }
             for (SubTask subTask : super.getSubTaskList()) {
-                writer.write(toCSVString(subTask) + "\n");
+                writer.write(subTask.toCSVString() + "\n");
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Data file save error: " + e.getMessage());
@@ -79,23 +37,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private static Task fromCSVString(String str) {
-        Task task = null;
         //"id,type,name,status,description,epic"
         String[] fields = str.split(",");
 
-        switch (TaskType.valueOf(fields[1])) {
-            case TaskType.TASK:
-                task = new Task(Integer.parseInt(fields[0]), fields[3], fields[4], TaskStatus.valueOf(fields[2]));
-                break;
-            case TaskType.EPIC:
-                task = new Epic(Integer.parseInt(fields[0]), fields[3], fields[4], TaskStatus.valueOf(fields[2]));
-                break;
-            case TaskType.SUBTASK:
-                task = new SubTask(Integer.parseInt(fields[0]), fields[3], fields[4], TaskStatus.valueOf(fields[2]),
-                        Integer.parseInt(fields[5]));
-        }
-
-        return task;
+        return switch (TaskType.valueOf(fields[1])) {
+            case TaskType.TASK ->
+                    new Task(Integer.parseInt(fields[0]), fields[3], fields[4], TaskStatus.valueOf(fields[2]));
+            case TaskType.EPIC ->
+                    new Epic(Integer.parseInt(fields[0]), fields[3], fields[4], TaskStatus.valueOf(fields[2]));
+            case TaskType.SUBTASK ->
+                    new SubTask(Integer.parseInt(fields[0]), fields[3], fields[4], TaskStatus.valueOf(fields[2]),
+                            Integer.parseInt(fields[5]));
+        };
     }
 
     public static FileBackedTaskManager loadFromFile(File file) {

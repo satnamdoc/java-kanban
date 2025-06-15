@@ -1,5 +1,7 @@
 package ru.yandex.practicum.taskmanagerapp.task;
 
+import ru.yandex.practicum.taskmanagerapp.taskmanager.FileBackedTaskManager;
+
 import java.util.Objects;
 
 public class Task {
@@ -78,5 +80,16 @@ public class Task {
                 ", status=" + status +
                 ", description length=" + description.length() +
                 '}';
+    }
+
+    public String toCSVString() {
+        return String.join(",",
+                Integer.toString(getId()),
+                TaskType.TASK.toString(),
+                getStatus().toString(),
+                getName(),
+                getDescription(),
+                ""
+        );
     }
 }
