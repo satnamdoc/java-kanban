@@ -2,16 +2,25 @@ import ru.yandex.practicum.taskmanagerapp.taskmanager.TaskManager;
 import ru.yandex.practicum.taskmanagerapp.taskmanager.FileBackedTaskManager;
 import ru.yandex.practicum.taskmanagerapp.task.*;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 public class Main {
+    private static final LocalDateTime TEST_START_TIME = LocalDateTime.of(2025, 1, 1, 0, 0);
+    private static final Duration TEST_DURATION = Duration.ofDays(1).plusHours(1).plusMinutes(1);
 
     public static void main(String[] args) {
         System.out.println("Поехали!");
-        FileBackedTaskManager.main(null);
-    }
 
+        Task task = new Task("Test task", "Test task description", TEST_START_TIME, TEST_DURATION);
+        Optional<LocalDateTime>  d = task.getEndTime();
+
+        //FileBackedTaskManager.main(null);
+    }
+/*
     public static void testInitTaskManagerSprint6(TaskManager taskManager) {
         System.out.println("--init--");
         taskManager.clear();
@@ -125,4 +134,6 @@ public class Main {
             System.out.println("]");
         }
     }
+
+ */
 }

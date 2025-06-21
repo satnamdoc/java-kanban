@@ -1,16 +1,25 @@
 package ru.yandex.practicum.taskmanagerapp.task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class Epic extends Task {
     private final ArrayList<Integer> subTaskIds  = new ArrayList<>();
+    private LocalDateTime endTime = null;
 
     public Epic(String name, String description) {
-        super(name, description);
+        super(name, description, null, Duration.ZERO);
     }
 
-    public Epic(int id, String name, String description, TaskStatus status) {
-        super(id, name, description, status);
+    public Epic(int id, String name, String description, TaskStatus status,
+                LocalDateTime startTime, Duration duration) {
+        super(id, name, description, status, startTime, duration);
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     public void addSubTask(int subTaskId) {
@@ -29,15 +38,19 @@ public class Epic extends Task {
         return new ArrayList<>(subTaskIds);
     }
 
+
     @Override
     public String toString() {
-        return "Epic{" +
+           return "Epic{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", status=" + status +
                 ", description length=" + description.length() +
-                ", subTaskIds=" + subTaskIds +
-                '}';
+                ", start time=" + ((startTime == null)?"UNKNOWN":startTime.format(DATE_TIME_FORMATTER)) +
+                ", duration=" + duration.toDaysPart() + "d " + duration.toHoursPart() + "h "
+                    + duration.toMinutesPart() + "m" +
+               ", subTaskIds=" + subTaskIds +
+               '}';
     }
 
     @Override
@@ -48,7 +61,15 @@ public class Epic extends Task {
                 getStatus().toString(),
                 getName(),
                 getDescription(),
+                ((startTime == null)?"UNKNOWN":startTime.format(DATE_TIME_FORMATTER)),
+                Long.toString(duration.toMinutes()),
                 ""
         );
     }
+
+    @Override
+    public Optional<LocalDateTime>  getEndTime() {
+        return Optional.ofNullable(endTime);
+    }
+
 }

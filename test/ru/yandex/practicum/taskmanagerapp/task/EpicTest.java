@@ -3,6 +3,8 @@ package ru.yandex.practicum.taskmanagerapp.task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,8 +42,14 @@ class EpicTest {
 
     @Test
     public void toStringTest() {
-        String epicStr = "Epic{id=" + NULL_ID + ", name='Test epic', status=NEW, description length=21, subTaskIds=["
-                + TEST_SUBTASK_ID + "]}";
+        String epicStr = "Epic{id=" + NULL_ID + ", name='Test epic', status=NEW, description length=21, " +
+                "start time=UNKNOWN, duration=0d 0h 0m, " +
+                "subTaskIds=[" + TEST_SUBTASK_ID + "]}";
         assertEquals(epicStr, epic.toString(), "Epic string view mismatch");
+    }
+
+    @Test
+    public void getEndTime() {
+        assertTrue(epic.getEndTime().isEmpty(), "New epic should have no start time");
     }
 }

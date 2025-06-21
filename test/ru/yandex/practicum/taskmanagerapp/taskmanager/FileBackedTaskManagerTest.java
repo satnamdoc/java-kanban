@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +21,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class FileBackedTaskManagerTest {
 
     private static FileBackedTaskManager fileBackedTaskManager;
+    private static final LocalDateTime TEST_START_TIME = LocalDateTime.of(2025, 1, 1, 0, 0);
+    private static final Duration TEST_DURATION = Duration.ofDays(1).plusHours(1).plusMinutes(1);
     private static File tempFile;
-    private static final String CSVFILE_HEADER = "id,type,name,status,description,epic";
+    private static final String CSVFILE_HEADER = "id,type,name,status,description,epic,start time,duration";
 
     @BeforeEach
     public void beforeEach()  throws IOException {
@@ -47,26 +51,28 @@ class FileBackedTaskManagerTest {
 
     @Test
     void saveTaskManagerToDataFile() throws IOException {
-        int taskId = fileBackedTaskManager.addTask(new Task("Test task", "description"));
+        int taskId = fileBackedTaskManager.addTask(new Task("Test task", "description",
+                TEST_START_TIME, TEST_DURATION));
         int epicId = fileBackedTaskManager.addEpic(new Epic("Test epic", "description"));
-        int subTaskId = fileBackedTaskManager.addSubTask(new SubTask("Test subtask", "description", epicId));
+        int subTaskId = fileBackedTaskManager.addSubTask(new SubTask("Test subtask", "description",
+                TEST_START_TIME, TEST_DURATION, epicId));
 
         String fileData = CSVFILE_HEADER + "\n" +
-                taskId + ",TASK,NEW,Test task,description,\n" +
-                epicId + ",EPIC,NEW,Test epic,description,\n" +
-                subTaskId + ",SUBTASK,NEW,Test subtask,description," + epicId + "\n";
+                taskId + ",TASK,NEW,Test task,description,01.01.2025 00:00,1501,\n" +
+                epicId + ",EPIC,NEW,Test epic,description,01.01.2025 00:00,1501,\n" +
+                subTaskId + ",SUBTASK,NEW,Test subtask,description,01.01.2025 00:00,1501," + epicId + "\n";
         assertEquals(fileData, Files.readString(Paths.get(tempFile.getAbsolutePath())),
                     "Data file corruption");
     }
 
     @Test
     void loadTaskManagerFromDataFile() {
-        Task task = new Task("Test task", "description");
-        int taskId = fileBackedTaskManager.addTask(task);
+        Task task = new Task("Test task", "description", TEST_START_TIME, TEST_DURATION);
+        fileBackedTaskManager.addTask(task);
         Epic epic = new Epic("Test epic", "description");
         int epicId = fileBackedTaskManager.addEpic(epic);
-        SubTask subTask = new SubTask("Test subtask", "description", epicId);
-        int subTaskId = fileBackedTaskManager.addSubTask(subTask);
+        SubTask subTask = new SubTask("Test subtask", "description", TEST_START_TIME, TEST_DURATION, epicId);
+        fileBackedTaskManager.addSubTask(subTask);
 
         FileBackedTaskManager tm = FileBackedTaskManager.loadFromFile(tempFile);
         assertEquals(List.of(task), tm.getTaskList(), "Task list mismatch");

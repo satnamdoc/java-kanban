@@ -3,7 +3,10 @@ package ru.yandex.practicum.taskmanagerapp.history;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.taskmanagerapp.task.Task;
+import ru.yandex.practicum.taskmanagerapp.task.TaskStatus;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,6 +14,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class InMemoryHistoryManagerTest {
 
     private static InMemoryHistoryManager inMemoryHistoryManager;
+    private static final LocalDateTime TEST_START_TIME = LocalDateTime.of(2025, 1, 1, 0, 0);
+    private static final Duration TEST_DURATION = Duration.ofDays(1).plusHours(1).plusMinutes(1);
+    private static final Task task1 =
+            new Task(100, "Test task #1", "description", TaskStatus.NEW, TEST_START_TIME, TEST_DURATION);
+    private static final Task task2 =
+            new Task(101, "Test task #2", "description", TaskStatus.NEW, TEST_START_TIME, TEST_DURATION);
+    private static final Task task3 =
+            new Task(102, "Test task #3", "description", TaskStatus.NEW, TEST_START_TIME, TEST_DURATION);
 
     @BeforeEach
     public void beforeEach() {
@@ -29,11 +40,8 @@ class InMemoryHistoryManagerTest {
     void addOneTask() {
         ArrayList<Task> taskHistory = new ArrayList<>();
 
-        Task task = new Task("Test task", "description");
-        task.setId(100);
-        taskHistory.add(task);
-        inMemoryHistoryManager.add(task);
-
+        taskHistory.add(task1);
+        inMemoryHistoryManager.add(task1);
         assertEquals(taskHistory, inMemoryHistoryManager.getHistory(), "Task history mismatch");
     }
 
@@ -41,15 +49,10 @@ class InMemoryHistoryManagerTest {
     void addTwoTasks() {
         ArrayList<Task> taskHistory = new ArrayList<>();
 
-        Task task1 = new Task("Test task #1", "description");
-        Task task2 = new Task("Test task #2", "description");
-        task1.setId(100);
         taskHistory.add(task1);
         inMemoryHistoryManager.add(task1);
-        task2.setId(101);
         taskHistory.add(task2);
         inMemoryHistoryManager.add(task2);
-
         assertEquals(taskHistory, inMemoryHistoryManager.getHistory(), "Task history mismatch");
     }
 
@@ -57,33 +60,18 @@ class InMemoryHistoryManagerTest {
     void addThreeTasks() {
         ArrayList<Task> taskHistory = new ArrayList<>();
 
-        Task task1 = new Task("Test task #1", "description");
-        Task task2 = new Task("Test task #2", "description");
-        Task task3 = new Task("Test task #3", "description");
-        task1.setId(100);
         taskHistory.add(task1);
         inMemoryHistoryManager.add(task1);
-        task2.setId(101);
         taskHistory.add(task2);
         inMemoryHistoryManager.add(task2);
-        task3.setId(102);
         taskHistory.add(task3);
         inMemoryHistoryManager.add(task3);
-
         assertEquals(taskHistory, inMemoryHistoryManager.getHistory(), "Task history mismatch");
     }
 
     @Test
     void removeFirstOfThreeTasks() {
         ArrayList<Task> taskHistory = new ArrayList<>();
-
-        Task task1 = new Task("Test task #1", "description");
-        Task task2 = new Task("Test task #2", "description");
-        Task task3 = new Task("Test task #3", "description");
-
-        task1.setId(100);
-        task2.setId(101);
-        task3.setId(102);
 
         inMemoryHistoryManager.add(task1);
         inMemoryHistoryManager.add(task2);
@@ -100,14 +88,6 @@ class InMemoryHistoryManagerTest {
     void removeSecondOfThreeTasks() {
         ArrayList<Task> taskHistory = new ArrayList<>();
 
-        Task task1 = new Task("Test task #1", "description");
-        Task task2 = new Task("Test task #2", "description");
-        Task task3 = new Task("Test task #3", "description");
-
-        task1.setId(100);
-        task2.setId(101);
-        task3.setId(102);
-
         inMemoryHistoryManager.add(task1);
         inMemoryHistoryManager.add(task2);
         inMemoryHistoryManager.add(task3);
@@ -123,14 +103,6 @@ class InMemoryHistoryManagerTest {
     void removeLastOfThreeTasks() {
         ArrayList<Task> taskHistory = new ArrayList<>();
 
-        Task task1 = new Task("Test task #1", "description");
-        Task task2 = new Task("Test task #2", "description");
-        Task task3 = new Task("Test task #3", "description");
-
-        task1.setId(100);
-        task2.setId(101);
-        task3.setId(102);
-
         inMemoryHistoryManager.add(task1);
         inMemoryHistoryManager.add(task2);
         inMemoryHistoryManager.add(task3);
@@ -144,12 +116,6 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void removeAllTasks() {
-        Task task1 = new Task("Test task #1", "description");
-        Task task2 = new Task("Test task #2", "description");
-
-        task1.setId(100);
-        task2.setId(101);
-
         inMemoryHistoryManager.add(task1);
         inMemoryHistoryManager.add(task2);
         inMemoryHistoryManager.remove(100);
@@ -163,12 +129,6 @@ class InMemoryHistoryManagerTest {
     void shouldBeSingleRecordForTask()
     {
         ArrayList<Task> taskHistory = new ArrayList<>();
-
-        Task task1 = new Task("Test task #1", "description");
-        Task task2 = new Task("Test task #2", "description");
-
-        task1.setId(100);
-        task2.setId(101);
 
         inMemoryHistoryManager.add(task1);
         inMemoryHistoryManager.add(task2);
