@@ -55,12 +55,12 @@ class FileBackedTaskManagerTest {
                 TEST_START_TIME, TEST_DURATION));
         int epicId = fileBackedTaskManager.addEpic(new Epic("Test epic", "description"));
         int subTaskId = fileBackedTaskManager.addSubTask(new SubTask("Test subtask", "description",
-                TEST_START_TIME, TEST_DURATION, epicId));
+                TEST_START_TIME.plus(TEST_DURATION), TEST_DURATION, epicId));
 
         String fileData = CSVFILE_HEADER + "\n" +
                 taskId + ",TASK,NEW,Test task,description,01.01.2025 00:00,1501,\n" +
-                epicId + ",EPIC,NEW,Test epic,description,01.01.2025 00:00,1501,\n" +
-                subTaskId + ",SUBTASK,NEW,Test subtask,description,01.01.2025 00:00,1501," + epicId + "\n";
+                epicId + ",EPIC,NEW,Test epic,description,02.01.2025 01:01,1501,\n" +
+                subTaskId + ",SUBTASK,NEW,Test subtask,description,02.01.2025 01:01,1501," + epicId + "\n";
         assertEquals(fileData, Files.readString(Paths.get(tempFile.getAbsolutePath())),
                     "Data file corruption");
     }
@@ -71,7 +71,8 @@ class FileBackedTaskManagerTest {
         fileBackedTaskManager.addTask(task);
         Epic epic = new Epic("Test epic", "description");
         int epicId = fileBackedTaskManager.addEpic(epic);
-        SubTask subTask = new SubTask("Test subtask", "description", TEST_START_TIME, TEST_DURATION, epicId);
+        SubTask subTask = new SubTask("Test subtask", "description",
+                TEST_START_TIME.plus(TEST_DURATION), TEST_DURATION, epicId);
         fileBackedTaskManager.addSubTask(subTask);
 
         FileBackedTaskManager tm = FileBackedTaskManager.loadFromFile(tempFile);

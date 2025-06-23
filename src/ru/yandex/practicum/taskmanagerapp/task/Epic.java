@@ -3,10 +3,11 @@ package ru.yandex.practicum.taskmanagerapp.task;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 
 public class Epic extends Task {
-    private final ArrayList<Integer> subTaskIds  = new ArrayList<>();
+    private final ArrayList<Integer> subTaskIds = new ArrayList<>();
     private LocalDateTime endTime = null;
 
     public Epic(String name, String description) {
@@ -27,7 +28,7 @@ public class Epic extends Task {
     }
 
     public void removeSubTask(int subTaskId) {
-        subTaskIds.remove((Integer)subTaskId);
+        subTaskIds.remove((Integer) subTaskId);
     }
 
     public void clearSubTasks() {
@@ -38,19 +39,26 @@ public class Epic extends Task {
         return new ArrayList<>(subTaskIds);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Epic epic = (Epic) o;
+        return Objects.equals(subTaskIds, epic.subTaskIds) && Objects.equals(endTime, epic.endTime);
+    }
 
     @Override
     public String toString() {
-           return "Epic{" +
+        return "Epic{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", status=" + status +
                 ", description length=" + description.length() +
-                ", start time=" + ((startTime == null)?"UNKNOWN":startTime.format(DATE_TIME_FORMATTER)) +
+                ", start time=" + ((startTime == null) ? "UNKNOWN" : startTime.format(DATE_TIME_FORMATTER)) +
                 ", duration=" + duration.toDaysPart() + "d " + duration.toHoursPart() + "h "
-                    + duration.toMinutesPart() + "m" +
-               ", subTaskIds=" + subTaskIds +
-               '}';
+                + duration.toMinutesPart() + "m" +
+                ", subTaskIds=" + subTaskIds +
+                '}';
     }
 
     @Override
@@ -61,15 +69,15 @@ public class Epic extends Task {
                 getStatus().toString(),
                 getName(),
                 getDescription(),
-                ((startTime == null)?"UNKNOWN":startTime.format(DATE_TIME_FORMATTER)),
+                ((startTime == null) ? "UNKNOWN" : startTime.format(DATE_TIME_FORMATTER)),
                 Long.toString(duration.toMinutes()),
                 ""
         );
     }
 
     @Override
-    public Optional<LocalDateTime>  getEndTime() {
+    public Optional<LocalDateTime> getEndTime() {
         return Optional.ofNullable(endTime);
     }
-
 }
+

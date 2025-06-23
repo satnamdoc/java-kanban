@@ -2,6 +2,7 @@ package ru.yandex.practicum.taskmanagerapp.task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class SubTask extends Task {
     private int epicId;
@@ -24,6 +25,14 @@ public class SubTask extends Task {
 
     public void setEpicId(int epicId) {
         this.epicId = epicId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        SubTask subTask = (SubTask) o;
+        return epicId == subTask.epicId;
     }
 
     @Override

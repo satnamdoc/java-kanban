@@ -89,8 +89,9 @@ public class Task {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        if (task.id == Task.NULL_ID) return false;                  //задачи с непроинициализированным id несравнимы
-        return id == task.id;
+        return id == task.id && Objects.equals(name, task.name) && status == task.status
+                && Objects.equals(description, task.description) && Objects.equals(startTime, task.startTime)
+                && Objects.equals(duration, task.duration);
     }
 
     @Override

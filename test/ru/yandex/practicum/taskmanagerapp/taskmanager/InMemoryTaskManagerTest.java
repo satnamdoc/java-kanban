@@ -125,10 +125,10 @@ class InMemoryTaskManagerTest {
         Task task = new Task("Test task", "Test task description", TEST_START_TIME, TEST_DURATION);
         int taskId = inMemoryTaskManager.addTask(task);
 
-        Task updatedTask = new Task("Updated", "Updated", TEST_START_TIME.plusHours(1), TEST_DURATION.plusHours(1));
+        Task updatedTask = new Task("Updated", "Updated", TEST_START_TIME, TEST_DURATION);
         updatedTask.setId(taskId);
 
-        assertTrue(inMemoryTaskManager.updateTask(task));
+        assertTrue(inMemoryTaskManager.updateTask(updatedTask));
         assertEquals(updatedTask, inMemoryTaskManager.getTask(taskId), "Tasks are not equal");
     }
 
@@ -169,7 +169,7 @@ class InMemoryTaskManagerTest {
         Epic updatedEpic = new Epic("Updated", "Updated");
         updatedEpic.setId(epicId);
 
-        assertTrue(inMemoryTaskManager.updateEpic(epic));
+        assertTrue(inMemoryTaskManager.updateEpic(updatedEpic));
         assertEquals(updatedEpic, inMemoryTaskManager.getEpic(epicId), "Epics are not equal");
     }
 
@@ -198,7 +198,7 @@ class InMemoryTaskManagerTest {
         SubTask updatedSubTask = new SubTask("Updated", "Updated", TEST_START_TIME, TEST_DURATION, epicId);
         updatedSubTask.setId(subTaskId);
 
-        assertTrue(inMemoryTaskManager.updateSubTask(subTask));
+        assertTrue(inMemoryTaskManager.updateSubTask(updatedSubTask));
         assertEquals(updatedSubTask, inMemoryTaskManager.getSubTask(subTaskId),
                 "Subtasks are not equal");
     }
@@ -378,7 +378,7 @@ class InMemoryTaskManagerTest {
         subTask1.setStatus(TaskStatus.DONE);
         inMemoryTaskManager.updateSubTask(subTask1);
         SubTask subTask2 = new SubTask("Test subtask", "Test subtask description",
-                TEST_START_TIME, TEST_DURATION, epicId);
+                TEST_START_TIME.plus(TEST_DURATION), TEST_DURATION, epicId);
         inMemoryTaskManager.addSubTask(subTask2);
 
         assertEquals(TaskStatus.IN_PROGRESS, epic.getStatus(), "Status is not IN_PRPGRESS");
@@ -392,7 +392,7 @@ class InMemoryTaskManagerTest {
                 TEST_START_TIME, TEST_DURATION, epicId);
         inMemoryTaskManager.addSubTask(subTask1);
         SubTask subTask2 = new SubTask("Test subtask", "Test subtask description",
-                TEST_START_TIME, TEST_DURATION, epicId);
+                TEST_START_TIME.plus(TEST_DURATION), TEST_DURATION, epicId);
         inMemoryTaskManager.addSubTask(subTask2);
 
         subTask1.setStatus(TaskStatus.IN_PROGRESS);
@@ -446,7 +446,7 @@ class InMemoryTaskManagerTest {
                 "description", TEST_START_TIME, TEST_DURATION));
         int epicId = inMemoryTaskManager.addEpic(new Epic("Test epic #", "description"));
         int subTaskId = inMemoryTaskManager.addSubTask(new SubTask("Test subtask",
-                "description", TEST_START_TIME, TEST_DURATION, epicId));
+                "description", TEST_START_TIME.plus(TEST_DURATION), TEST_DURATION, epicId));
 
         history.add(inMemoryTaskManager.getTask(taskId));
         history.add(inMemoryTaskManager.getEpic(epicId));
@@ -496,10 +496,10 @@ class InMemoryTaskManagerTest {
         ArrayList<Task> history = new ArrayList<>();
 
         int taskId = inMemoryTaskManager.addTask(new Task("Test task", "description",
-                TEST_START_TIME, TEST_DURATION));
+                TEST_START_TIME, Duration.ofDays(1)));
         int epicId = inMemoryTaskManager.addEpic(new Epic("Test epic", "description"));
         int subTaskId = inMemoryTaskManager.addSubTask(new SubTask("Test subtask",
-                "description", TEST_START_TIME, TEST_DURATION, epicId));
+                "description", TEST_START_TIME.plusDays(1), Duration.ofDays(1), epicId));
 
         inMemoryTaskManager.getEpic(taskId);
         history.add(inMemoryTaskManager.getEpic(epicId));
@@ -520,7 +520,7 @@ class InMemoryTaskManagerTest {
     public void updateEpicTimingAfterAddSubTask() {
         int epicId = inMemoryTaskManager.addEpic(new Epic("Test epic", "description"));
         inMemoryTaskManager.addSubTask(new SubTask("Test subtask #1",
-                "description", TEST_START_TIME, Duration.ofDays(10), epicId));
+                "description", TEST_START_TIME, Duration.ofDays(5), epicId));
         inMemoryTaskManager.addSubTask(new SubTask("Test subtask #2",
                 "description", TEST_START_TIME.plusDays(5), Duration.ofDays(10), epicId));
         inMemoryTaskManager.addSubTask(new SubTask("Test subtask #3",
@@ -528,7 +528,7 @@ class InMemoryTaskManagerTest {
 
         assertEquals(TEST_START_TIME, inMemoryTaskManager.getEpic(epicId).getStartTime().get(),
                 "Epic start time mismatch");
-        assertEquals(Duration.ofDays(21), inMemoryTaskManager.getEpic(epicId).getDuration(),
+        assertEquals(Duration.ofDays(16), inMemoryTaskManager.getEpic(epicId).getDuration(),
                 "Epic duration mismatch");
         assertEquals(TEST_START_TIME.plusDays(21), inMemoryTaskManager.getEpic(epicId).getEndTime().get(),
                 "Epic end time mismatch");
@@ -538,7 +538,7 @@ class InMemoryTaskManagerTest {
     public void updateEpicTimingAfterRemoveSubTask() {
         int epicId = inMemoryTaskManager.addEpic(new Epic("Test epic", "description"));
         int subTaskId = inMemoryTaskManager.addSubTask(new SubTask("Test subtask #1",
-                "description", TEST_START_TIME, Duration.ofDays(10), epicId));
+                "description", TEST_START_TIME, Duration.ofDays(5), epicId));
         inMemoryTaskManager.addSubTask(new SubTask("Test subtask #2",
                 "description", TEST_START_TIME.plusDays(5), Duration.ofDays(10), epicId));
         inMemoryTaskManager.addSubTask(new SubTask("Test subtask #3",
@@ -557,19 +557,19 @@ class InMemoryTaskManagerTest {
     public void updateEpicTimingAfterUpdateSubTask() {
         int epicId = inMemoryTaskManager.addEpic(new Epic("Test epic", "description"));
         int subTaskId = inMemoryTaskManager.addSubTask(new SubTask("Test subtask #1",
-                "description", TEST_START_TIME, Duration.ofDays(10), epicId));
+                "description", TEST_START_TIME, Duration.ofDays(5), epicId));
         inMemoryTaskManager.addSubTask(new SubTask("Test subtask #2",
                 "description", TEST_START_TIME.plusDays(5), Duration.ofDays(10), epicId));
         inMemoryTaskManager.addSubTask(new SubTask("Test subtask #3",
                 "description", TEST_START_TIME.plusDays(20), Duration.ofDays(1), epicId));
         inMemoryTaskManager.updateSubTask(new SubTask(subTaskId, "Updated", "Updated", TaskStatus.DONE,
-                TEST_START_TIME.plusDays(30), Duration.ofDays(5), epicId));
+                TEST_START_TIME.plusDays(30), Duration.ofDays(1), epicId));
 
         assertEquals(TEST_START_TIME.plusDays(5), inMemoryTaskManager.getEpic(epicId).getStartTime().get(),
                 "Epic start time mismatch");
-        assertEquals(Duration.ofDays(16), inMemoryTaskManager.getEpic(epicId).getDuration(),
+        assertEquals(Duration.ofDays(12), inMemoryTaskManager.getEpic(epicId).getDuration(),
                 "Epic duration mismatch");
-        assertEquals(TEST_START_TIME.plusDays(35), inMemoryTaskManager.getEpic(epicId).getEndTime().get(),
+        assertEquals(TEST_START_TIME.plusDays(31), inMemoryTaskManager.getEpic(epicId).getEndTime().get(),
                 "Epic end time mismatch");
     }
 
@@ -593,18 +593,18 @@ class InMemoryTaskManagerTest {
     @Test
     public void getPrioritizedTasks() {
         int taskId1 = inMemoryTaskManager.addTask(new Task("Test task #1", "description",
-                TEST_START_TIME.plusDays(2), TEST_DURATION));
+                TEST_START_TIME.plusDays(2), Duration.ofDays(1)));
         int epicId = inMemoryTaskManager.addEpic(new Epic("Test epic", "description"));
         int subTaskId1 = inMemoryTaskManager.addSubTask(new SubTask("Test subtask #1",
-                "description", TEST_START_TIME.plusDays(1), TEST_DURATION, epicId));
+                "description", TEST_START_TIME.plusDays(1), Duration.ofDays(1), epicId));
         int subTaskId2 = inMemoryTaskManager.addSubTask(new SubTask("Test subtask #2",
-                "description", TEST_START_TIME.plusDays(3), TEST_DURATION, epicId));
+                "description", TEST_START_TIME.plusDays(3), Duration.ofDays(1), epicId));
         int taskId2 = inMemoryTaskManager.addTask(new Task("Test task #2", "description",
-                TEST_START_TIME, TEST_DURATION));
+                TEST_START_TIME, Duration.ofDays(1)));
         int taskId3 = inMemoryTaskManager.addTask(new Task("Test task #3", "description",
-                TEST_START_TIME.plusDays(6), TEST_DURATION));
+                TEST_START_TIME.plusDays(6), Duration.ofDays(1)));
         int subTaskId3 = inMemoryTaskManager.addSubTask(new SubTask("Test subtask #3",
-                "description", TEST_START_TIME.plusDays(7), TEST_DURATION, epicId));
+                "description", TEST_START_TIME.plusDays(7), Duration.ofDays(1), epicId));
         inMemoryTaskManager.addTask(new Task("Test task #4", "description", null, Duration.ZERO));
         inMemoryTaskManager.addSubTask(new SubTask("Test subtask #4", "description", null, Duration.ZERO, epicId));
 
@@ -620,7 +620,7 @@ class InMemoryTaskManagerTest {
         assertEquals(sortedTasks, inMemoryTaskManager.getPrioritizedTasks(), "Task priority mismatch");
 
         inMemoryTaskManager.updateTask(new Task(taskId2, "Test task #2", "description", TaskStatus.DONE,
-                TEST_START_TIME.plusDays(4), TEST_DURATION));
+                TEST_START_TIME.plusDays(4), Duration.ofDays(1)));
         sortedTasks = Arrays.asList(
                 inMemoryTaskManager.getSubTask(subTaskId1),
                 inMemoryTaskManager.getTask(taskId1),
@@ -643,7 +643,7 @@ class InMemoryTaskManagerTest {
         assertEquals(sortedTasks, inMemoryTaskManager.getPrioritizedTasks(), "Task priority mismatch");
 
         inMemoryTaskManager.updateSubTask(new SubTask(subTaskId2, "Test subtask #2", "description", TaskStatus.DONE,
-                TEST_START_TIME, TEST_DURATION, epicId));
+                TEST_START_TIME, Duration.ofDays(1), epicId));
         sortedTasks = Arrays.asList(
                 inMemoryTaskManager.getSubTask(subTaskId2),
                 inMemoryTaskManager.getSubTask(subTaskId1),
@@ -686,5 +686,15 @@ class InMemoryTaskManagerTest {
 
         inMemoryTaskManager.clearTasks();
         assertTrue(inMemoryTaskManager.getPrioritizedTasks().isEmpty(), "Task priority mismatch");
+    }
+
+    @Test
+    public void isTimeConflict() {
+
+    }
+
+    @Test
+    public void isTimeConflictQ() {
+
     }
 }
