@@ -171,7 +171,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public List<SubTask> getSubTasksOfEpic(int epicId) {
+    public List<SubTask> getEpicSubTasks(int epicId) {
         if (!epics.containsKey(epicId)) {
             return null;
         }

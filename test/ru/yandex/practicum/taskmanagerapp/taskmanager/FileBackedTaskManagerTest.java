@@ -18,11 +18,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FileBackedTaskManagerTest {
+class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager>{
 
-    private static FileBackedTaskManager fileBackedTaskManager;
-    private static final LocalDateTime TEST_START_TIME = LocalDateTime.of(2025, 1, 1, 0, 0);
-    private static final Duration TEST_DURATION = Duration.ofDays(1).plusHours(1).plusMinutes(1);
     private static File tempFile;
     private static final String CSVFILE_HEADER = "id,type,name,status,description,epic,start time,duration";
 
@@ -30,8 +27,8 @@ class FileBackedTaskManagerTest {
     public void beforeEach()  throws IOException {
             tempFile = File.createTempFile("testtmdata", ".tmp");
             tempFile.deleteOnExit();
-            fileBackedTaskManager = new FileBackedTaskManager(tempFile, Managers.getDefaultHistory());
-            fileBackedTaskManager.clear();  // trigger file saving
+            taskManager = new FileBackedTaskManager(tempFile, Managers.getDefaultHistory());
+            taskManager.clear();  // trigger file saving
     }
 
     @Test
@@ -48,13 +45,12 @@ class FileBackedTaskManagerTest {
         assertTrue(tm.getSubTaskList().isEmpty(), "Task manager has a subtask");
     }
 
-
     @Test
     void saveTaskManagerToDataFile() throws IOException {
-        int taskId = fileBackedTaskManager.addTask(new Task("Test task", "description",
+        int taskId = taskManager.addTask(new Task("Test task", "description",
                 TEST_START_TIME, TEST_DURATION));
-        int epicId = fileBackedTaskManager.addEpic(new Epic("Test epic", "description"));
-        int subTaskId = fileBackedTaskManager.addSubTask(new SubTask("Test subtask", "description",
+        int epicId = taskManager.addEpic(new Epic("Test epic", "description"));
+        int subTaskId = taskManager.addSubTask(new SubTask("Test subtask", "description",
                 TEST_START_TIME.plus(TEST_DURATION), TEST_DURATION, epicId));
 
         String fileData = CSVFILE_HEADER + "\n" +
@@ -68,12 +64,12 @@ class FileBackedTaskManagerTest {
     @Test
     void loadTaskManagerFromDataFile() {
         Task task = new Task("Test task", "description", TEST_START_TIME, TEST_DURATION);
-        fileBackedTaskManager.addTask(task);
+        taskManager.addTask(task);
         Epic epic = new Epic("Test epic", "description");
-        int epicId = fileBackedTaskManager.addEpic(epic);
+        int epicId = taskManager.addEpic(epic);
         SubTask subTask = new SubTask("Test subtask", "description",
                 TEST_START_TIME.plus(TEST_DURATION), TEST_DURATION, epicId);
-        fileBackedTaskManager.addSubTask(subTask);
+        taskManager.addSubTask(subTask);
 
         FileBackedTaskManager tm = FileBackedTaskManager.loadFromFile(tempFile);
         assertEquals(List.of(task), tm.getTaskList(), "Task list mismatch");

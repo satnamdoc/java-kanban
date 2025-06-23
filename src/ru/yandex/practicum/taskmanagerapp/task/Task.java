@@ -34,7 +34,7 @@ public class Task {
         this.description = description;
         this.status = status;
         this.startTime = startTime;
-        this.duration = duration;
+        this.duration = duration == null ? Duration.ZERO : duration;
     }
 
     public int getId() {
@@ -119,7 +119,7 @@ public class Task {
                 getStatus().toString(),
                 getName(),
                 getDescription(),
-                startTime.format(DATE_TIME_FORMATTER),
+                ((startTime == null) ? "UNKNOWN" : startTime.format(DATE_TIME_FORMATTER)),
                 Long.toString(duration.toMinutes()),
                 ""
         );

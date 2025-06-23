@@ -57,7 +57,7 @@ public class SubTask extends Task {
                 getStatus().toString(),
                 getName(),
                 getDescription(),
-                startTime.format(DATE_TIME_FORMATTER),
+                ((startTime == null) ? "UNKNOWN" : startTime.format(DATE_TIME_FORMATTER)),
                 Long.toString(duration.toMinutes()),
                 Integer.toString(getEpicId())
         );
