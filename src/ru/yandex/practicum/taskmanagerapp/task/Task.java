@@ -106,7 +106,7 @@ public class Task {
                 ", name='" + name + '\'' +
                 ", status=" + status +
                 ", description length=" + description.length() +
-                ", start time=" + ((startTime == null)?"UNKNOWN":startTime.format(DATE_TIME_FORMATTER)) +
+                ", start time=" + ((startTime == null) ? "UNKNOWN" : startTime.format(DATE_TIME_FORMATTER)) +
                 ", duration=" + duration.toDaysPart() + "d " + duration.toHoursPart() + "h "
                 + duration.toMinutesPart() + "m" +
                 '}';
