@@ -77,7 +77,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
     @Test
     public void saveToBadDataFile() {
-        taskManager = new FileBackedTaskManager(new File("bad\\bad"), Managers.getDefaultHistory());
+        taskManager = new FileBackedTaskManager(new File("bad\\//bad"), Managers.getDefaultHistory());
         assertThrows(ManagerSaveException.class, taskManager::clear, "Bad file saving should throw exception");
     }
 
