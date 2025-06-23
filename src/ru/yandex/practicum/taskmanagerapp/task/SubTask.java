@@ -2,7 +2,6 @@ package ru.yandex.practicum.taskmanagerapp.task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 public class SubTask extends Task {
     private int epicId;
@@ -42,7 +41,7 @@ public class SubTask extends Task {
                 ", name='" + name + '\'' +
                 ", status=" + status +
                 ", description length=" + description.length() +
-                ", start time=" + ((startTime == null)?"UNKNOWN":startTime.format(DATE_TIME_FORMATTER)) +
+                ", start time=" + ((startTime == null) ? "UNKNOWN" : startTime.format(DATE_TIME_FORMATTER)) +
                 ", duration=" + duration.toDaysPart() + "d " + duration.toHoursPart() + "h "
                 + duration.toMinutesPart() + "m" +
                 ", epicId=" + epicId +

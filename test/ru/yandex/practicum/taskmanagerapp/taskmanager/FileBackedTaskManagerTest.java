@@ -2,33 +2,31 @@ package ru.yandex.practicum.taskmanagerapp.taskmanager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.taskmanagerapp.exception.ManagerLoadException;
+import ru.yandex.practicum.taskmanagerapp.exception.ManagerSaveException;
 import ru.yandex.practicum.taskmanagerapp.task.Epic;
 import ru.yandex.practicum.taskmanagerapp.task.SubTask;
 import ru.yandex.practicum.taskmanagerapp.task.Task;
-import ru.yandex.practicum.taskmanagerapp.task.TaskStatus;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager>{
+class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
     private static File tempFile;
     private static final String CSVFILE_HEADER = "id,type,name,status,description,epic,start time,duration";
 
     @BeforeEach
-    public void beforeEach()  throws IOException {
-            tempFile = File.createTempFile("testtmdata", ".tmp");
-            tempFile.deleteOnExit();
-            taskManager = new FileBackedTaskManager(tempFile, Managers.getDefaultHistory());
-            taskManager.clear();  // trigger file saving
+    public void beforeEach() throws IOException {
+        tempFile = File.createTempFile("testtmdata", ".tmp");
+        tempFile.deleteOnExit();
+        taskManager = new FileBackedTaskManager(tempFile, Managers.getDefaultHistory());
+        taskManager.clear();  // trigger file saving
     }
 
     @Test
@@ -58,7 +56,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager>{
                 epicId + ",EPIC,NEW,Test epic,description,02.01.2025 01:01,1501,\n" +
                 subTaskId + ",SUBTASK,NEW,Test subtask,description,02.01.2025 01:01,1501," + epicId + "\n";
         assertEquals(fileData, Files.readString(Paths.get(tempFile.getAbsolutePath())),
-                    "Data file corruption");
+                "Data file corruption");
     }
 
     @Test
@@ -75,5 +73,17 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager>{
         assertEquals(List.of(task), tm.getTaskList(), "Task list mismatch");
         assertEquals(List.of(epic), tm.getEpicList(), "Epic list mismatch");
         assertEquals(List.of(subTask), tm.getSubTaskList(), "Subtask list mismatch");
+    }
+
+    @Test
+    public void saveToBadDataFile() {
+        taskManager = new FileBackedTaskManager(new File("bad\\bad"), Managers.getDefaultHistory());
+        assertThrows(ManagerSaveException.class, taskManager::clear, "Bad file saving should throw exception");
+    }
+
+    @Test
+    public void loadFromBadDataFile() {
+        assertThrows(ManagerLoadException.class, () -> FileBackedTaskManager.loadFromFile(new File("bad\\bad")),
+                "Bad file loading should throw exception");
     }
 }

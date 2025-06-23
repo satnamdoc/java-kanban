@@ -25,7 +25,7 @@ class EpicTest {
         List<Integer> subTaskIds = epic.getSubTaskIds();
         assertEquals(1, subTaskIds.size(), "Test epic should have the only one subtask");
         assertEquals(TEST_SUBTASK_ID, subTaskIds.getFirst(),
-            "Test epic should have subtask with TEST_SUBTASK_ID id");
+                "Test epic should have subtask with TEST_SUBTASK_ID id");
     }
 
     @Test

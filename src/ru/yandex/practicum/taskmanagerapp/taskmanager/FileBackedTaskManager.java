@@ -203,15 +203,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
         return res;
     }
-/*
+
     public static void main(String[] args) {
         File file = new File("data.csv");
         TaskManager tm1 = new FileBackedTaskManager(file, Managers.getDefaultHistory());
+        LocalDateTime dt = LocalDateTime.of(2025, 1, 1, 0, 0);
 
         Random rnd = new Random();
         int rndInt = rnd.nextInt(3) + 3;
         for (int i = 0; i < rndInt; i++) {
-            tm1.addTask(new Task("Simple task #" + i, "test task #" + i));
+            tm1.addTask(new Task("Simple task #" + i, "test task #" + i, dt, Duration.ofDays(1)));
+            dt = dt.plusDays(1);
         }
 
         rndInt = rnd.nextInt(3) + 3;
@@ -220,7 +222,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             int rndInt1 = rnd.nextInt(3) + 3;
             for (int j = 0; j < rndInt1; j++) {
                 tm1.addSubTask(new SubTask("Subtask #" + j, "subtask #" + j
-                        + " for epic #" + i, epicId));
+                        + " for epic #" + i, dt, Duration.ofDays(1), epicId));
+                dt = dt.plusDays(1);
             }
         }
 
@@ -233,5 +236,4 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             System.out.println("file backed task manager should be fixed");
         }
     }
- */
 }

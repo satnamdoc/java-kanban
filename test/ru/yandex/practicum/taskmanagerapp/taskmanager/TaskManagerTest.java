@@ -31,6 +31,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(1, tasks.size(), "Wrong number of tasks");
         assertEquals(task, tasks.getFirst(), "Tasks are not equal");
     }
+
     @Test
     void addEpic() {
         Epic epic = new Epic("Test epic", "Test epic description");
@@ -122,7 +123,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         updatedTask.setId(taskId);
 
         assertTrue(taskManager.updateTask(updatedTask));
-        assertEquals(updatedTask, taskManager.getTask(taskId), "Tasks are not equal");
+        assertEquals(updatedTask, taskManager.getTask(taskId).get(), "Tasks are not equal");
     }
 
 
@@ -163,7 +164,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         updatedEpic.setId(epicId);
 
         assertTrue(taskManager.updateEpic(updatedEpic));
-        assertEquals(updatedEpic, taskManager.getEpic(epicId), "Epics are not equal");
+        assertEquals(updatedEpic, taskManager.getEpic(epicId).get(), "Epics are not equal");
     }
 
     @Test
@@ -192,7 +193,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         updatedSubTask.setId(subTaskId);
 
         assertTrue(taskManager.updateSubTask(updatedSubTask));
-        assertEquals(updatedSubTask, taskManager.getSubTask(subTaskId),
+        assertEquals(updatedSubTask, taskManager.getSubTask(subTaskId).get(),
                 "Subtasks are not equal");
     }
 
@@ -272,7 +273,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int taskId = taskManager.addTask(new Task("Test task", "Test task description",
                 TEST_START_TIME, TEST_DURATION));
         assertTrue(taskManager.removeTask(taskId), "removeTask should return true");
-        assertNull(taskManager.getTask(taskId), "Removed task has been returned");
+        assertTrue(taskManager.getTask(taskId).isEmpty(), "Removed task has been returned");
     }
 
     @Test
@@ -287,8 +288,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int subTaskId = taskManager.addSubTask(new SubTask("Test subtask",
                 "Test subtask description", TEST_START_TIME, TEST_DURATION, epicId));
         assertTrue(taskManager.removeEpic(epicId), "removeEpic should return true");
-        assertNull(taskManager.getEpic(epicId), "Removed epic has been returned");
-        assertNull(taskManager.getSubTask(subTaskId), "Subtask of the removed epic is still in the list");
+        assertTrue(taskManager.getEpic(epicId).isEmpty(), "Removed epic has been returned");
+        assertTrue(taskManager.getSubTask(subTaskId).isEmpty(), "Subtask of the removed epic is still in the list");
     }
 
 
@@ -304,12 +305,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int subTaskId = taskManager.addSubTask(new SubTask("Test subtask",
                 "Test subtask description", TEST_START_TIME, TEST_DURATION, epicId));
         assertTrue(taskManager.removeSubTask(subTaskId), "removeSubTask should return true");
-        assertNull(taskManager.getSubTask(subTaskId), "Removed subtask has been returned");
+        assertTrue(taskManager.getSubTask(subTaskId).isEmpty(), "Removed subtask has been returned");
     }
 
     /// ////////////////////////
     /// Epic status management tests
-    ///
     @Test
     public void shouldSetEpicStatusToNewWhenAllSubtasksAreNew() {
         Epic epic = new Epic("Test epic", "Test epic description");
@@ -498,9 +498,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int subTaskId = taskManager.addSubTask(new SubTask("Test subtask",
                 "description", TEST_START_TIME.plusDays(1), Duration.ofDays(1), epicId));
 
-        history.add(taskManager.getTask(taskId));
-        history.add(taskManager.getEpic(epicId));
-        history.add(taskManager.getSubTask(subTaskId));
+        history.add(taskManager.getTask(taskId).get());
+        history.add(taskManager.getEpic(epicId).get());
+        history.add(taskManager.getSubTask(subTaskId).get());
 
         assertEquals(history, taskManager.getHistory(), "Task history mismatch");
     }
@@ -552,13 +552,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 "description", TEST_START_TIME.plusDays(1), Duration.ofDays(1), epicId));
 
         taskManager.getEpic(taskId);
-        history.add(taskManager.getEpic(epicId));
-        history.add(taskManager.getSubTask(subTaskId));
+        history.add(taskManager.getEpic(epicId).get());
+        history.add(taskManager.getSubTask(subTaskId).get());
         taskManager.clearTasks();
         assertEquals(history, taskManager.getHistory(), "Task history mismatch");
 
         history.clear();
-        history.add(taskManager.getEpic(epicId));
+        history.add(taskManager.getEpic(epicId).get());
         taskManager.clearSubTasks();
         assertEquals(history, taskManager.getHistory(), "Task history mismatch");
 
@@ -576,11 +576,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.addSubTask(new SubTask("Test subtask #3",
                 "description", TEST_START_TIME.plusDays(20), Duration.ofDays(1), epicId));
 
-        assertEquals(TEST_START_TIME, taskManager.getEpic(epicId).getStartTime().get(),
+        assertEquals(TEST_START_TIME, taskManager.getEpic(epicId).get().getStartTime().get(),
                 "Epic start time mismatch");
-        assertEquals(Duration.ofDays(16), taskManager.getEpic(epicId).getDuration(),
+        assertEquals(Duration.ofDays(16), taskManager.getEpic(epicId).get().getDuration(),
                 "Epic duration mismatch");
-        assertEquals(TEST_START_TIME.plusDays(21), taskManager.getEpic(epicId).getEndTime().get(),
+        assertEquals(TEST_START_TIME.plusDays(21), taskManager.getEpic(epicId).get().getEndTime().get(),
                 "Epic end time mismatch");
     }
 
@@ -595,11 +595,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 "description", TEST_START_TIME.plusDays(20), Duration.ofDays(1), epicId));
         taskManager.removeSubTask(subTaskId);
 
-        assertEquals(TEST_START_TIME.plusDays(5), taskManager.getEpic(epicId).getStartTime().get(),
+        assertEquals(TEST_START_TIME.plusDays(5), taskManager.getEpic(epicId).get().getStartTime().get(),
                 "Epic start time mismatch");
-        assertEquals(Duration.ofDays(11), taskManager.getEpic(epicId).getDuration(),
+        assertEquals(Duration.ofDays(11), taskManager.getEpic(epicId).get().getDuration(),
                 "Epic duration mismatch");
-        assertEquals(TEST_START_TIME.plusDays(21), taskManager.getEpic(epicId).getEndTime().get(),
+        assertEquals(TEST_START_TIME.plusDays(21), taskManager.getEpic(epicId).get().getEndTime().get(),
                 "Epic end time mismatch");
     }
 
@@ -615,11 +615,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.updateSubTask(new SubTask(subTaskId, "Updated", "Updated", TaskStatus.DONE,
                 TEST_START_TIME.plusDays(30), Duration.ofDays(1), epicId));
 
-        assertEquals(TEST_START_TIME.plusDays(5), taskManager.getEpic(epicId).getStartTime().get(),
+        assertEquals(TEST_START_TIME.plusDays(5), taskManager.getEpic(epicId).get().getStartTime().get(),
                 "Epic start time mismatch");
-        assertEquals(Duration.ofDays(12), taskManager.getEpic(epicId).getDuration(),
+        assertEquals(Duration.ofDays(12), taskManager.getEpic(epicId).get().getDuration(),
                 "Epic duration mismatch");
-        assertEquals(TEST_START_TIME.plusDays(31), taskManager.getEpic(epicId).getEndTime().get(),
+        assertEquals(TEST_START_TIME.plusDays(31), taskManager.getEpic(epicId).get().getEndTime().get(),
                 "Epic end time mismatch");
     }
 
@@ -634,15 +634,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 "description", TEST_START_TIME.plusDays(20), Duration.ofDays(1), epicId));
         taskManager.clearSubTasks();
 
-        assertTrue(taskManager.getEpic(epicId).getStartTime().isEmpty(), "Epic start time should be unknown");
-        assertEquals(Duration.ZERO, taskManager.getEpic(epicId).getDuration(),
+        assertTrue(taskManager.getEpic(epicId).get().getStartTime().isEmpty(), "Epic start time should be unknown");
+        assertEquals(Duration.ZERO, taskManager.getEpic(epicId).get().getDuration(),
                 "Epic duration should be 0");
-        assertTrue(taskManager.getEpic(epicId).getEndTime().isEmpty(), "Epic end time should be unknown");
+        assertTrue(taskManager.getEpic(epicId).get().getEndTime().isEmpty(), "Epic end time should be unknown");
     }
 
     /// ///////////////////////////
     /// task priority tests
-    ///
     @Test
     public void getPrioritizedTasks() {
         int taskId1 = taskManager.addTask(new Task("Test task #1", "description",
@@ -663,77 +662,77 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
 
         List<? super Task> sortedTasks = Arrays.asList(
-                taskManager.getTask(taskId2),
-                taskManager.getSubTask(subTaskId1),
-                taskManager.getTask(taskId1),
-                taskManager.getSubTask(subTaskId2),
-                taskManager.getTask(taskId3),
-                taskManager.getSubTask(subTaskId3)
+                taskManager.getTask(taskId2).get(),
+                taskManager.getSubTask(subTaskId1).get(),
+                taskManager.getTask(taskId1).get(),
+                taskManager.getSubTask(subTaskId2).get(),
+                taskManager.getTask(taskId3).get(),
+                taskManager.getSubTask(subTaskId3).get()
         );
         assertEquals(sortedTasks, taskManager.getPrioritizedTasks(), "Task priority mismatch");
 
         taskManager.updateTask(new Task(taskId2, "Test task #2", "description", TaskStatus.DONE,
                 TEST_START_TIME.plusDays(4), Duration.ofDays(1)));
         sortedTasks = Arrays.asList(
-                taskManager.getSubTask(subTaskId1),
-                taskManager.getTask(taskId1),
-                taskManager.getSubTask(subTaskId2),
-                taskManager.getTask(taskId2),
-                taskManager.getTask(taskId3),
-                taskManager.getSubTask(subTaskId3)
+                taskManager.getSubTask(subTaskId1).get(),
+                taskManager.getTask(taskId1).get(),
+                taskManager.getSubTask(subTaskId2).get(),
+                taskManager.getTask(taskId2).get(),
+                taskManager.getTask(taskId3).get(),
+                taskManager.getSubTask(subTaskId3).get()
         );
         assertEquals(sortedTasks, taskManager.getPrioritizedTasks(), "Task priority mismatch");
 
         taskManager.updateTask(new Task(taskId2, "Test task #2", "description", TaskStatus.DONE,
                 null, Duration.ZERO));
         sortedTasks = Arrays.asList(
-                taskManager.getSubTask(subTaskId1),
-                taskManager.getTask(taskId1),
-                taskManager.getSubTask(subTaskId2),
-                taskManager.getTask(taskId3),
-                taskManager.getSubTask(subTaskId3)
+                taskManager.getSubTask(subTaskId1).get(),
+                taskManager.getTask(taskId1).get(),
+                taskManager.getSubTask(subTaskId2).get(),
+                taskManager.getTask(taskId3).get(),
+                taskManager.getSubTask(subTaskId3).get()
         );
         assertEquals(sortedTasks, taskManager.getPrioritizedTasks(), "Task priority mismatch");
 
         taskManager.updateSubTask(new SubTask(subTaskId2, "Test subtask #2", "description", TaskStatus.DONE,
                 TEST_START_TIME, Duration.ofDays(1), epicId));
         sortedTasks = Arrays.asList(
-                taskManager.getSubTask(subTaskId2),
-                taskManager.getSubTask(subTaskId1),
-                taskManager.getTask(taskId1),
-                taskManager.getTask(taskId3),
-                taskManager.getSubTask(subTaskId3)
+                taskManager.getSubTask(subTaskId2).get(),
+                taskManager.getSubTask(subTaskId1).get(),
+                taskManager.getTask(taskId1).get(),
+                taskManager.getTask(taskId3).get(),
+                taskManager.getSubTask(subTaskId3).get()
         );
         assertEquals(sortedTasks, taskManager.getPrioritizedTasks(), "Task priority mismatch");
 
         taskManager.updateSubTask(new SubTask(subTaskId3, "Test subtask #3", "description", TaskStatus.DONE,
                 null, Duration.ZERO, epicId));
         sortedTasks = Arrays.asList(
-                taskManager.getSubTask(subTaskId2),
-                taskManager.getSubTask(subTaskId1),
-                taskManager.getTask(taskId1),
-                taskManager.getTask(taskId3)
+                taskManager.getSubTask(subTaskId2).get(),
+                taskManager.getSubTask(subTaskId1).get(),
+                taskManager.getTask(taskId1).get(),
+                taskManager.getTask(taskId3).get()
         );
         assertEquals(sortedTasks, taskManager.getPrioritizedTasks(), "Task priority mismatch");
 
         taskManager.removeTask(taskId1);
         sortedTasks = Arrays.asList(
-                taskManager.getSubTask(subTaskId2),
-                taskManager.getSubTask(subTaskId1),
-                taskManager.getTask(taskId3)
+                taskManager.getSubTask(subTaskId2).get(),
+                taskManager.getSubTask(subTaskId1).get(),
+                taskManager.getTask(taskId3).get()
         );
         assertEquals(sortedTasks, taskManager.getPrioritizedTasks(), "Task priority mismatch");
 
         taskManager.removeSubTask(subTaskId1);
         sortedTasks = Arrays.asList(
-                taskManager.getSubTask(subTaskId2),
-                taskManager.getTask(taskId3)
+                taskManager.getSubTask(subTaskId2).get(),
+                taskManager.getTask(taskId3).get()
         );
         assertEquals(sortedTasks, taskManager.getPrioritizedTasks(), "Task priority mismatch");
 
         taskManager.clearSubTasks();
         sortedTasks = Arrays.asList(
-                taskManager.getTask(taskId3)
+                taskManager.getTask(taskId3).get()
         );
         assertEquals(sortedTasks, taskManager.getPrioritizedTasks(), "Task priority mismatch");
 
@@ -743,7 +742,6 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     /// ///////////////////////
     /// time conflict tests
-    ///
     @Test
     public void shouldAddTaskWithoutTimeIntersection() {
         Task task1 = new Task("Test task #1", "description", TEST_START_TIME.plusDays(2), Duration.ofDays(2));

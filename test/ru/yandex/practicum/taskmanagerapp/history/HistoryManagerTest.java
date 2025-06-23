@@ -1,10 +1,8 @@
 package ru.yandex.practicum.taskmanagerapp.history;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.taskmanagerapp.task.Task;
 import ru.yandex.practicum.taskmanagerapp.task.TaskStatus;
-import ru.yandex.practicum.taskmanagerapp.taskmanager.TaskManager;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -30,7 +28,7 @@ public abstract class HistoryManagerTest<T extends HistoryManager> {
                 "Task history should be empty after history manager initilization");
     }
 
-    /////////////
+    /// //////////
     /// add and remove 1, 2, 3 tasks to test internal linked list
     @Test
     void addOneTask() {
@@ -122,8 +120,7 @@ public abstract class HistoryManagerTest<T extends HistoryManager> {
     }
 
     @Test
-    void shouldBeSingleRecordForTask()
-    {
+    void shouldBeSingleRecordForTask() {
         ArrayList<Task> taskHistory = new ArrayList<>();
 
         historyManager.add(task1);

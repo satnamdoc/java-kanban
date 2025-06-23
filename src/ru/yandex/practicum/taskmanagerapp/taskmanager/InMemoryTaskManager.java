@@ -30,8 +30,8 @@ public class InMemoryTaskManager implements TaskManager {
             new TreeSet<>(Comparator.comparing(
                     t -> t.getStartTime()
                             .orElseThrow(() -> new NullPointerException("Start time attribute is null"))
-                    )
-                );
+            )
+            );
     // Structure stores a 1-hour intervals and task ids
     private final HashMap<Long, HashSet<Integer>> taskSchedule = new HashMap<>();
 
@@ -73,8 +73,8 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int addSubTask(SubTask subTask) {
         if (subTask == null
-            || !epics.containsKey(subTask.getEpicId())
-            || isTimeConflictQ(subTask)) {
+                || !epics.containsKey(subTask.getEpicId())
+                || isTimeConflictQ(subTask)) {
             return Task.NULL_ID;
         }
         int id = generateId();
@@ -83,7 +83,7 @@ public class InMemoryTaskManager implements TaskManager {
         epics.get(subTask.getEpicId()).addSubTask(id);
         updateEpicStatus(epics.get(subTask.getEpicId()));
         updateEpicTiming(epics.get(subTask.getEpicId()));
-        if (subTask.getStartTime().isPresent()){
+        if (subTask.getStartTime().isPresent()) {
             tasksSortedByStartTime.add(subTask);
             addToTaskShedule(subTask);
         }
@@ -106,7 +106,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         tasks.replace(task.getId(), task);
         tasksSortedByStartTime.remove(oldTask);
-        if (task.getStartTime().isPresent()){
+        if (task.getStartTime().isPresent()) {
             tasksSortedByStartTime.add(task);
             addToTaskShedule(task);
         }
@@ -148,7 +148,7 @@ public class InMemoryTaskManager implements TaskManager {
         updateEpicStatus(epics.get(subTask.getEpicId()));
         updateEpicTiming(epics.get(subTask.getEpicId()));
         tasksSortedByStartTime.remove(oldSubTask);
-        if (subTask.getStartTime().isPresent()){
+        if (subTask.getStartTime().isPresent()) {
             tasksSortedByStartTime.add(subTask);
             addToTaskShedule(subTask);
         }
@@ -224,24 +224,30 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getTask(int id) {
+    public Optional<Task> getTask(int id) {
         Task task = tasks.get(id);
-        historyManager.add(task);
-        return task;
+        if (task != null) {
+            historyManager.add(task);
+        }
+        return Optional.ofNullable(task);
     }
 
     @Override
-    public Epic getEpic(int id) {
+    public Optional<Epic> getEpic(int id) {
         Epic epic = epics.get(id);
-        historyManager.add(epic);
-        return epic;
+        if (epic != null) {
+            historyManager.add(epic);
+        }
+        return Optional.ofNullable(epic);
     }
 
     @Override
-    public SubTask getSubTask(int id) {
+    public Optional<SubTask> getSubTask(int id) {
         SubTask subTask = subTasks.get(id);
-        historyManager.add(subTask);
-        return subTask;
+        if (subTask != null) {
+            historyManager.add(subTask);
+        }
+        return Optional.ofNullable(subTask);
     }
 
     @Override
@@ -285,7 +291,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     private void updateEpicStatus(Epic epic) {
         Set<TaskStatus> statuses = epic.getSubTaskIds().stream()
-                .map(this::getSubTask).map(SubTask::getStatus)
+                .map(subTasks::get).map(SubTask::getStatus)
                 .collect((Collectors.toSet()));
 
         if (statuses.isEmpty() || statuses.equals(Set.of(TaskStatus.NEW))) {
@@ -347,11 +353,11 @@ public class InMemoryTaskManager implements TaskManager {
         return new ArrayList<>(tasksSortedByStartTime);
     }
 
-    /////////////////////////////////////
+    /// //////////////////////////////////
     /// 1st implementation of time conflict check
     private static boolean isTimeConflict(Task task1, Task task2) {
-        Optional <LocalDateTime> ost1 = task1.getStartTime();
-        Optional <LocalDateTime> ost2 = task2.getStartTime();
+        Optional<LocalDateTime> ost1 = task1.getStartTime();
+        Optional<LocalDateTime> ost2 = task2.getStartTime();
 
         if (ost1.isEmpty() || ost2.isEmpty()) {
             return false;
@@ -361,7 +367,7 @@ public class InMemoryTaskManager implements TaskManager {
         LocalDateTime et1 = task1.getEndTime().get();
         LocalDateTime et2 = task2.getEndTime().get();
 
-        return  (st1.isBefore(st2) && et1.isAfter(st2))
+        return (st1.isBefore(st2) && et1.isAfter(st2))
                 || (st2.isBefore(st1) && et2.isAfter(st1))
                 || st1.equals(st2);
     }
@@ -371,12 +377,12 @@ public class InMemoryTaskManager implements TaskManager {
         return getPrioritizedTasks().stream().anyMatch(t -> isTimeConflict((Task) t, task));
     }
 
-    /////////////////////////////////////
+    /// //////////////////////////////////
     /// 2nd implementation of time conflict check
     private LongStream getTaskSheduleIntervals(Task task) {
         final long intervalLength = 60 * 60;
         long firstInterval = task.getStartTime().get().toEpochSecond(ZoneOffset.UTC) / intervalLength;
-        long lastInterval =  (task.getEndTime().get().toEpochSecond(ZoneOffset.UTC) - 1) / intervalLength;
+        long lastInterval = (task.getEndTime().get().toEpochSecond(ZoneOffset.UTC) - 1) / intervalLength;
         return LongStream.range(firstInterval, lastInterval + 1);
     }
 
@@ -410,10 +416,10 @@ public class InMemoryTaskManager implements TaskManager {
                 .filter(Objects::nonNull)
                 .flatMap(HashSet::stream)
                 .map(id -> {
-                    if (getTask(id) != null) {
-                        return getTask(id);
+                    if (tasks.get(id) != null) {
+                        return tasks.get(id);
                     }
-                    return getSubTask(id);
+                    return subTasks.get(id);
                 })
                 .anyMatch(t -> isTimeConflict(task, t));
     }
