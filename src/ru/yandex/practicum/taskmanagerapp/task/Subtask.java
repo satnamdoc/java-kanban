@@ -3,16 +3,16 @@ package ru.yandex.practicum.taskmanagerapp.task;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public class SubTask extends Task {
+public class Subtask extends Task {
     private int epicId;
 
-    public SubTask(String name, String description, LocalDateTime startTime,
+    public Subtask(String name, String description, LocalDateTime startTime,
                    Duration duration, int epicId) {
         super(name, description, startTime, duration);
         this.epicId = epicId;
     }
 
-    public SubTask(int id, String name, String description, TaskStatus status,
+    public Subtask(int id, String name, String description, TaskStatus status,
                    LocalDateTime startTime, Duration duration, int epicId) {
         super(id, name, description, status, startTime, duration);
         this.epicId = epicId;
@@ -30,13 +30,13 @@ public class SubTask extends Task {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        SubTask subTask = (SubTask) o;
-        return epicId == subTask.epicId;
+        Subtask subtask = (Subtask) o;
+        return epicId == subtask.epicId;
     }
 
     @Override
     public String toString() {
-        return "SubTask{" +
+        return "Subtask{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", status=" + status +

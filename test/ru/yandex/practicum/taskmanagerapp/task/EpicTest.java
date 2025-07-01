@@ -16,34 +16,34 @@ class EpicTest {
     @BeforeEach
     public void beforeEach() {
         epic = new Epic("Test epic", "Test epic description");
-        epic.addSubTask(TEST_SUBTASK_ID);
+        epic.addSubtask(TEST_SUBTASK_ID);
     }
 
     @Test
-    void shouldContainsTestIdSubTask() {
-        List<Integer> subTaskIds = epic.getSubTaskIds();
-        assertEquals(1, subTaskIds.size(), "Test epic should have the only one subtask");
-        assertEquals(TEST_SUBTASK_ID, subTaskIds.getFirst(),
+    void shouldContainsTestIdSubtask() {
+        List<Integer> subtaskIds = epic.getSubtaskIds();
+        assertEquals(1, subtaskIds.size(), "Test epic should have the only one subtask");
+        assertEquals(TEST_SUBTASK_ID, subtaskIds.getFirst(),
                 "Test epic should have subtask with TEST_SUBTASK_ID id");
     }
 
     @Test
-    void removeSubTask() {
-        epic.removeSubTask(TEST_SUBTASK_ID);
-        assertTrue(epic.getSubTaskIds().isEmpty(), "Test epic shouldn't have subtasks");
+    void removeSubtask() {
+        epic.removeSubtask(TEST_SUBTASK_ID);
+        assertTrue(epic.getSubtaskIds().isEmpty(), "Test epic shouldn't have subtasks");
     }
 
     @Test
-    void clearSubTasks() {
-        epic.clearSubTasks();
-        assertTrue(epic.getSubTaskIds().isEmpty(), "Test epic shouldn't have subtasks");
+    void clearSubtasks() {
+        epic.clearSubtasks();
+        assertTrue(epic.getSubtaskIds().isEmpty(), "Test epic shouldn't have subtasks");
     }
 
     @Test
     public void toStringTest() {
         String epicStr = "Epic{id=" + NULL_ID + ", name='Test epic', status=NEW, description length=21, " +
                 "start time=UNKNOWN, duration=0d 0h 0m, " +
-                "subTaskIds=[" + TEST_SUBTASK_ID + "]}";
+                "subtaskIds=[" + TEST_SUBTASK_ID + "]}";
         assertEquals(epicStr, epic.toString(), "Epic string view mismatch");
     }
 

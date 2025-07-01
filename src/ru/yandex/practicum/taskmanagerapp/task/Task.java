@@ -49,7 +49,7 @@ public class Task {
         return status;
     }
 
-    public void setStatus(TaskStatus status) {
+    protected void setStatus(TaskStatus status) {
         this.status = status;
     }
 
@@ -73,7 +73,7 @@ public class Task {
         return Optional.ofNullable(startTime);
     }
 
-    public void setStartTime(LocalDateTime startTime) {
+    protected void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
 
@@ -81,7 +81,7 @@ public class Task {
         return duration;
     }
 
-    public void setDuration(Duration duration) {
+    protected void setDuration(Duration duration) {
         this.duration = duration;
     }
 

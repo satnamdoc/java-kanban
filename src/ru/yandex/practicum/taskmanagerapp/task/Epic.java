@@ -2,41 +2,41 @@ package ru.yandex.practicum.taskmanagerapp.task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class Epic extends Task {
-    private final ArrayList<Integer> subTaskIds = new ArrayList<>();
+    private final List<Integer> subtaskIds = new ArrayList<>();
     private LocalDateTime endTime = null;
 
     public Epic(String name, String description) {
         super(name, description, null, Duration.ZERO);
     }
 
-    public Epic(int id, String name, String description, TaskStatus status,
-                LocalDateTime startTime, Duration duration) {
+    public Epic(int id, String name, String description, TaskStatus status, LocalDateTime startTime,
+                Duration duration, LocalDateTime endTime, List<Integer> subtaskIds) {
         super(id, name, description, status, startTime, duration);
+        this.endTime = endTime;
+        this.subtaskIds.addAll(subtaskIds);
     }
 
-    public void setEndTime(LocalDateTime endTime) {
+    protected void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
 
-    public void addSubTask(int subTaskId) {
-        subTaskIds.add(subTaskId);
+    public void addSubtask(int subtaskId) {
+        subtaskIds.add(subtaskId);
     }
 
-    public void removeSubTask(int subTaskId) {
-        subTaskIds.remove((Integer) subTaskId);
+    public void removeSubtask(int subtaskId) {
+        subtaskIds.remove((Integer) subtaskId);
     }
 
-    public void clearSubTasks() {
-        subTaskIds.clear();
+    public void clearSubtasks() {
+        subtaskIds.clear();
     }
 
-    public ArrayList<Integer> getSubTaskIds() {
-        return new ArrayList<>(subTaskIds);
+    public List<Integer> getSubtaskIds() {
+        return new ArrayList<>(subtaskIds);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class Epic extends Task {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Epic epic = (Epic) o;
-        return Objects.equals(subTaskIds, epic.subTaskIds) && Objects.equals(endTime, epic.endTime);
+        return Objects.equals(subtaskIds, epic.subtaskIds);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class Epic extends Task {
                 ", start time=" + ((startTime == null) ? "UNKNOWN" : startTime.format(DATE_TIME_FORMATTER)) +
                 ", duration=" + duration.toDaysPart() + "d " + duration.toHoursPart() + "h "
                 + duration.toMinutesPart() + "m" +
-                ", subTaskIds=" + subTaskIds +
+                ", subtaskIds=" + subtaskIds +
                 '}';
     }
 

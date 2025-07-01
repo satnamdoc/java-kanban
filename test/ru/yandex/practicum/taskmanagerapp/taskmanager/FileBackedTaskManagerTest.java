@@ -5,8 +5,9 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.taskmanagerapp.exception.ManagerLoadException;
 import ru.yandex.practicum.taskmanagerapp.exception.ManagerSaveException;
 import ru.yandex.practicum.taskmanagerapp.task.Epic;
-import ru.yandex.practicum.taskmanagerapp.task.SubTask;
+import ru.yandex.practicum.taskmanagerapp.task.Subtask;
 import ru.yandex.practicum.taskmanagerapp.task.Task;
+import ru.yandex.practicum.taskmanagerapp.task.TaskStatus;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
     private static File tempFile;
-    private static final String CSVFILE_HEADER = "id,type,name,status,description,epic,start time,duration";
+    private static final String CSVFILE_HEADER = "id,type,status,name,description,start time,duration,epic";
 
     @BeforeEach
     public void beforeEach() throws IOException {
@@ -40,7 +41,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         FileBackedTaskManager tm = FileBackedTaskManager.loadFromFile(tempFile);
         assertTrue(tm.getTaskList().isEmpty(), "Task manager has a task");
         assertTrue(tm.getEpicList().isEmpty(), "Task manager has an epic");
-        assertTrue(tm.getSubTaskList().isEmpty(), "Task manager has a subtask");
+        assertTrue(tm.getSubtaskList().isEmpty(), "Task manager has a subtask");
     }
 
     @Test
@@ -48,13 +49,13 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         int taskId = taskManager.addTask(new Task("Test task", "description",
                 TEST_START_TIME, TEST_DURATION));
         int epicId = taskManager.addEpic(new Epic("Test epic", "description"));
-        int subTaskId = taskManager.addSubTask(new SubTask("Test subtask", "description",
+        int subtaskId = taskManager.addSubtask(new Subtask("Test subtask", "description",
                 TEST_START_TIME.plus(TEST_DURATION), TEST_DURATION, epicId));
 
         String fileData = CSVFILE_HEADER + "\n" +
                 taskId + ",TASK,NEW,Test task,description,01.01.2025 00:00,1501,\n" +
                 epicId + ",EPIC,NEW,Test epic,description,02.01.2025 01:01,1501,\n" +
-                subTaskId + ",SUBTASK,NEW,Test subtask,description,02.01.2025 01:01,1501," + epicId + "\n";
+                subtaskId + ",SUBTASK,NEW,Test subtask,description,02.01.2025 01:01,1501," + epicId + "\n";
         assertEquals(fileData, Files.readString(Paths.get(tempFile.getAbsolutePath())),
                 "Data file corruption");
     }
@@ -65,14 +66,21 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         taskManager.addTask(task);
         Epic epic = new Epic("Test epic", "description");
         int epicId = taskManager.addEpic(epic);
-        SubTask subTask = new SubTask("Test subtask", "description",
+        Subtask subtask = new Subtask("Test subtask", "description",
                 TEST_START_TIME.plus(TEST_DURATION), TEST_DURATION, epicId);
-        taskManager.addSubTask(subTask);
+        taskManager.addSubtask(subtask);
 
         FileBackedTaskManager tm = FileBackedTaskManager.loadFromFile(tempFile);
         assertEquals(List.of(task), tm.getTaskList(), "Task list mismatch");
-        assertEquals(List.of(epic), tm.getEpicList(), "Epic list mismatch");
-        assertEquals(List.of(subTask), tm.getSubTaskList(), "Subtask list mismatch");
+        assertEquals(List.of(
+                        new Epic(epicId, "Test epic", "description",
+                                TaskStatus.NEW, TEST_START_TIME.plus(TEST_DURATION), TEST_DURATION,
+                                TEST_START_TIME.plus(TEST_DURATION).plus(TEST_DURATION),
+                                List.of(subtask.getId())
+                                )
+                        ),
+                        tm.getEpicList(), "Epic list mismatch");
+        assertEquals(List.of(subtask), tm.getSubtaskList(), "Subtask list mismatch");
     }
 
     @Test
