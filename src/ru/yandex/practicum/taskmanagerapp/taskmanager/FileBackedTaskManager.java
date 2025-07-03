@@ -6,13 +6,16 @@ import ru.yandex.practicum.taskmanagerapp.history.HistoryManager;
 import ru.yandex.practicum.taskmanagerapp.task.*;
 
 import java.io.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
-    private File dataFile;
-    private static final String CSVFILE_HEADER = "id,type,name,status,description,epic";
+    private final File dataFile;
+    private static final String CSVFILE_HEADER =
+            "id,type,status,name,description,start time,duration,epic";
 
     public FileBackedTaskManager(File dataFile, HistoryManager historyManager) {
         super(historyManager);
@@ -28,8 +31,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             for (Epic epic : super.getEpicList()) {
                 writer.write(epic.toCSVString() + "\n");
             }
-            for (SubTask subTask : super.getSubTaskList()) {
-                writer.write(subTask.toCSVString() + "\n");
+            for (Subtask subtask : super.getSubtaskList()) {
+                writer.write(subtask.toCSVString() + "\n");
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Data file save error: " + e.getMessage());
@@ -37,17 +40,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private static Task fromCSVString(String str) {
-        //"id,type,name,status,description,epic"
+        //"id,type,status,name,description,start time,duration,epic,"
         String[] fields = str.split(",");
 
-        return switch (TaskType.valueOf(fields[1])) {
-            case TaskType.TASK ->
-                    new Task(Integer.parseInt(fields[0]), fields[3], fields[4], TaskStatus.valueOf(fields[2]));
-            case TaskType.EPIC ->
-                    new Epic(Integer.parseInt(fields[0]), fields[3], fields[4], TaskStatus.valueOf(fields[2]));
-            case TaskType.SUBTASK ->
-                    new SubTask(Integer.parseInt(fields[0]), fields[3], fields[4], TaskStatus.valueOf(fields[2]),
-                            Integer.parseInt(fields[5]));
+        int id = Integer.parseInt(fields[0]);
+        TaskType type = TaskType.valueOf(fields[1]);
+        TaskStatus status = TaskStatus.valueOf(fields[2]);
+        String name = fields[3];
+        String description = fields[4];
+        LocalDateTime startTime = (fields[5].equals("UNKNOWN")) ? null
+                : LocalDateTime.parse(fields[5], Task.DATE_TIME_FORMATTER);
+        Duration duration = Duration.ofMinutes(Integer.parseInt(fields[6]));
+        int epicId = (fields.length == 8) ? Integer.parseInt(fields[7]) : Task.NULL_ID;
+
+        return switch (type) {
+            case TaskType.TASK -> new Task(id, name, description, status, startTime, duration);
+            case TaskType.EPIC -> new Epic(id, name, description, status, startTime, duration,
+                    startTime.plus(duration), new ArrayList<>());
+            case TaskType.SUBTASK -> new Subtask(id, name, description, status, startTime, duration, epicId);
         };
     }
 
@@ -61,7 +71,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try (FileReader reader = new FileReader(file); BufferedReader br = new BufferedReader(reader)) {
             ArrayList<Task> tasks = new ArrayList<>();
             HashMap<Integer, Epic> epics = new HashMap<>(); // Map helps to bind epic and subtasks
-            ArrayList<SubTask> subTasks = new ArrayList<>();
+            ArrayList<Subtask> subtasks = new ArrayList<>();
 
             br.readLine();
             while (br.ready()) {
@@ -69,17 +79,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 Task task = fromCSVString(str);
                 if (task instanceof Epic) {
                     epics.put(task.getId(), (Epic) task);
-                } else if (task instanceof SubTask) {
-                    subTasks.add((SubTask) task);
+                } else if (task instanceof Subtask) {
+                    subtasks.add((Subtask) task);
                 } else {
                     tasks.add(task);
                 }
             }
-            //bind epics and subtasks
-            for (SubTask subTask : subTasks) {
-                epics.get(subTask.getEpicId()).addSubTask(subTask.getId());
+            // bind epics and subtasks
+            for (Subtask subtask : subtasks) {
+                epics.get(subtask.getEpicId()).addSubtask(subtask.getId());
             }
-            taskManager.load(tasks, new ArrayList<Epic>(epics.values()), subTasks);
+            taskManager.load(tasks, new ArrayList<>(epics.values()), subtasks);
             return taskManager;
         } catch (IOException e) {
             throw new ManagerLoadException("Data file load error: " + e.getMessage());
@@ -106,8 +116,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public int addSubTask(SubTask subTask) {
-        int id = super.addSubTask(subTask);
+    public int addSubtask(Subtask subtask) {
+        int id = super.addSubtask(subtask);
         if (id != Task.NULL_ID) {
             save();
         }
@@ -115,27 +125,27 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public boolean updateTask(Task task) {
-        boolean res = super.updateTask(task);
-        if (res) {
+    public Task updateTask(Task task) {
+        Task res = super.updateTask(task);
+        if (res != null) {
             save();
         }
         return res;
     }
 
     @Override
-    public boolean updateEpic(Epic epic) {
-        boolean res = super.updateEpic(epic);
-        if (res) {
+    public Epic updateEpic(Epic epic) {
+        Epic res = super.updateEpic(epic);
+        if (res != null) {
             save();
         }
         return res;
     }
 
     @Override
-    public boolean updateSubTask(SubTask subTask) {
-        boolean res = super.updateSubTask(subTask);
-        if (res) {
+    public Subtask updateSubtask(Subtask subtask) {
+        Subtask res = super.updateSubtask(subtask);
+        if (res != null) {
             save();
         }
         return res;
@@ -160,8 +170,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void clearSubTasks() {
-        super.clearSubTasks();
+    public void clearSubtasks() {
+        super.clearSubtasks();
         save();
     }
 
@@ -185,8 +195,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public boolean removeSubTask(int id) {
-        boolean res = super.removeSubTask(id);
+    public boolean removeSubtask(int id) {
+        boolean res = super.removeSubtask(id);
         if (res) {
             save();
         }
@@ -196,11 +206,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public static void main(String[] args) {
         File file = new File("data.csv");
         TaskManager tm1 = new FileBackedTaskManager(file, Managers.getDefaultHistory());
+        LocalDateTime dt = LocalDateTime.of(2025, 1, 1, 0, 0);
 
         Random rnd = new Random();
         int rndInt = rnd.nextInt(3) + 3;
         for (int i = 0; i < rndInt; i++) {
-            tm1.addTask(new Task("Simple task #" + i, "test task #" + i));
+            tm1.addTask(new Task("Simple task #" + i, "test task #" + i, dt, Duration.ofDays(1)));
+            dt = dt.plusDays(1);
         }
 
         rndInt = rnd.nextInt(3) + 3;
@@ -208,15 +220,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             int epicId = tm1.addEpic(new Epic("Epic #" + i, "test epic #" + i));
             int rndInt1 = rnd.nextInt(3) + 3;
             for (int j = 0; j < rndInt1; j++) {
-                tm1.addSubTask(new SubTask("Subtask #" + j, "subtask #" + j
-                        + " for epic #" + i, epicId));
+                tm1.addSubtask(new Subtask("Subtask #" + j, "subtask #" + j
+                        + " for epic #" + i, dt, Duration.ofDays(1), epicId));
+                dt = dt.plusDays(1);
             }
         }
 
         TaskManager tm2 = FileBackedTaskManager.loadFromFile(file);
         if (tm1.getTaskList().equals(tm2.getTaskList())
                 && tm1.getEpicList().equals(tm2.getEpicList())
-                && tm1.getSubTaskList().equals(tm2.getSubTaskList())) {
+                && tm1.getSubtaskList().equals(tm2.getSubtaskList())) {
             System.out.println("file backed task manager works fine");
         } else {
             System.out.println("file backed task manager should be fixed");

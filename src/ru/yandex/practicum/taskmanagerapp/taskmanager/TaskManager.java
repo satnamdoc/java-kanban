@@ -1,32 +1,32 @@
 package ru.yandex.practicum.taskmanagerapp.taskmanager;
 
 import ru.yandex.practicum.taskmanagerapp.task.Epic;
-import ru.yandex.practicum.taskmanagerapp.task.SubTask;
+import ru.yandex.practicum.taskmanagerapp.task.Subtask;
 import ru.yandex.practicum.taskmanagerapp.task.Task;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TaskManager {
     int addTask(Task task);
 
     int addEpic(Epic epic);
 
-    int addSubTask(SubTask subTask);
+    int addSubtask(Subtask subtask);
 
-    boolean updateTask(Task task);
+    Task updateTask(Task task);
 
-    boolean updateEpic(Epic epic);
+    Epic updateEpic(Epic epic);
 
-    boolean updateSubTask(SubTask subTask);
+    Subtask updateSubtask(Subtask subtask);
 
-    // при получении списков объектов из TaskManager хорошо бы делать клонирование...
     List<Task> getTaskList();
 
     List<Epic> getEpicList();
 
-    List<SubTask> getSubTaskList();
+    List<Subtask> getSubtaskList();
 
-    List<SubTask> getSubTasksOfEpic(int epicId);
+    List<Subtask> getEpicSubtasks(int epicId);
 
     void clear();
 
@@ -34,19 +34,21 @@ public interface TaskManager {
 
     void clearEpics();
 
-    void clearSubTasks();
+    void clearSubtasks();
 
-    Task getTask(int id);
+    Optional<Task> getTask(int id);
 
-    Task getEpic(int id);
+    Optional<Epic> getEpic(int id);
 
-    Task getSubTask(int id);
+    Optional<Subtask> getSubtask(int id);
 
     boolean removeTask(int id);
 
     boolean removeEpic(int id);
 
-    boolean removeSubTask(int id);
+    boolean removeSubtask(int id);
 
     List<Task> getHistory();
+
+    List<? super Task> getPrioritizedTasks();
 }
