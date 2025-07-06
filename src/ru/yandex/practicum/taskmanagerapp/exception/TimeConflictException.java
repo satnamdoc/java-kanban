@@ -4,6 +4,7 @@ public class TimeConflictException extends ManagerException {
     public TimeConflictException() {
         super();
     }
+
     public TimeConflictException(String message) {
         super(message);
     }
