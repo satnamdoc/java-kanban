@@ -134,7 +134,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic == null) {
             throw new NullPointerException();
         }
-        if(epics.replace(epic.getId(), epic) == null) {
+        if (epics.replace(epic.getId(), epic) == null) {
             throw new NotFoundException();
         }
         return updateEpicInternalState(epic);
