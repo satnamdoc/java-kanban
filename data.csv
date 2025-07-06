@@ -1,0 +1,26 @@
+id,type,status,name,description,start time,duration,epic
+100,TASK,NEW,Simple task #0,test task #0,01.01.2025 00:00,1440,
+101,TASK,NEW,Simple task #1,test task #1,02.01.2025 00:00,1440,
+102,TASK,NEW,Simple task #2,test task #2,03.01.2025 00:00,1440,
+114,EPIC,NEW,Epic #2,test epic #2,13.01.2025 00:00,5760,
+103,EPIC,NEW,Epic #0,test epic #0,04.01.2025 00:00,7200,
+119,EPIC,NEW,Epic #3,test epic #3,17.01.2025 00:00,7200,
+109,EPIC,NEW,Epic #1,test epic #1,09.01.2025 00:00,5760,
+104,SUBTASK,NEW,Subtask #0,subtask #0 for epic #0,04.01.2025 00:00,1440,103
+105,SUBTASK,NEW,Subtask #1,subtask #1 for epic #0,05.01.2025 00:00,1440,103
+106,SUBTASK,NEW,Subtask #2,subtask #2 for epic #0,06.01.2025 00:00,1440,103
+107,SUBTASK,NEW,Subtask #3,subtask #3 for epic #0,07.01.2025 00:00,1440,103
+108,SUBTASK,NEW,Subtask #4,subtask #4 for epic #0,08.01.2025 00:00,1440,103
+110,SUBTASK,NEW,Subtask #0,subtask #0 for epic #1,09.01.2025 00:00,1440,109
+111,SUBTASK,NEW,Subtask #1,subtask #1 for epic #1,10.01.2025 00:00,1440,109
+112,SUBTASK,NEW,Subtask #2,subtask #2 for epic #1,11.01.2025 00:00,1440,109
+113,SUBTASK,NEW,Subtask #3,subtask #3 for epic #1,12.01.2025 00:00,1440,109
+115,SUBTASK,NEW,Subtask #0,subtask #0 for epic #2,13.01.2025 00:00,1440,114
+116,SUBTASK,NEW,Subtask #1,subtask #1 for epic #2,14.01.2025 00:00,1440,114
+117,SUBTASK,NEW,Subtask #2,subtask #2 for epic #2,15.01.2025 00:00,1440,114
+118,SUBTASK,NEW,Subtask #3,subtask #3 for epic #2,16.01.2025 00:00,1440,114
+120,SUBTASK,NEW,Subtask #0,subtask #0 for epic #3,17.01.2025 00:00,1440,119
+121,SUBTASK,NEW,Subtask #1,subtask #1 for epic #3,18.01.2025 00:00,1440,119
+122,SUBTASK,NEW,Subtask #2,subtask #2 for epic #3,19.01.2025 00:00,1440,119
+123,SUBTASK,NEW,Subtask #3,subtask #3 for epic #3,20.01.2025 00:00,1440,119
+124,SUBTASK,NEW,Subtask #4,subtask #4 for epic #3,21.01.2025 00:00,1440,119

@@ -5,7 +5,6 @@ import ru.yandex.practicum.taskmanagerapp.task.Subtask;
 import ru.yandex.practicum.taskmanagerapp.task.Task;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface TaskManager {
     int addTask(Task task);
@@ -36,17 +35,17 @@ public interface TaskManager {
 
     void clearSubtasks();
 
-    Optional<Task> getTask(int id);
+    Task getTask(int id);
 
-    Optional<Epic> getEpic(int id);
+    Epic getEpic(int id);
 
-    Optional<Subtask> getSubtask(int id);
+    Subtask getSubtask(int id);
 
-    boolean removeTask(int id);
+    Task removeTask(int id);
 
-    boolean removeEpic(int id);
+    Epic removeEpic(int id);
 
-    boolean removeSubtask(int id);
+    Subtask removeSubtask(int id);
 
     List<Task> getHistory();
 

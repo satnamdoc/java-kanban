@@ -1,10 +1,11 @@
-import ru.yandex.practicum.taskmanagerapp.taskmanager.FileBackedTaskManager;
+import ru.yandex.practicum.taskmanagerapp.httpserver.HttpTaskServer;
+
+import java.io.IOException;
 
 public class Main {
 
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws IOException {
         System.out.println("Поехали!");
-        FileBackedTaskManager.main(null);
+        HttpTaskServer.main(null);
     }
 }
