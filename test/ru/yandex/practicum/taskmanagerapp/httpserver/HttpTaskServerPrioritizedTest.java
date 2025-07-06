@@ -28,12 +28,15 @@ public class HttpTaskServerPrioritizedTest {
     HttpClient client = HttpClient.newHttpClient();
 
     Gson gson = HttpTaskServer.getGson();
-    class TaskListTypeToken extends TypeToken<List<Task>> {}
+
+    class TaskListTypeToken extends TypeToken<List<Task>> {
+    }
 
     protected static final LocalDateTime TEST_START_TIME = LocalDateTime.of(2025, 1, 1, 0, 0);
     protected static final Duration TEST_DURATION = Duration.ofDays(1);
 
-    public  HttpTaskServerPrioritizedTest() throws IOException {}
+    public HttpTaskServerPrioritizedTest() throws IOException {
+    }
 
     @BeforeEach
     public void setUp() throws IOException {
@@ -47,17 +50,17 @@ public class HttpTaskServerPrioritizedTest {
     }
 
     @Test
-    public void getHistoryTest()throws IOException, InterruptedException {
-        int taskId1 = taskManager.addTask(new Task("Test task #1", "Test task #1", 
+    public void getHistoryTest() throws IOException, InterruptedException {
+        int taskId1 = taskManager.addTask(new Task("Test task #1", "Test task #1",
                 TEST_START_TIME, Duration.ofDays(1)));
         int epicId = taskManager.addEpic(new Epic("Test epic #1", "Test epic #1"));
         int subtaskId1 = taskManager.addSubtask(new Subtask("Test subtask #1", "desc",
                 TEST_START_TIME.plusDays(1), Duration.ofDays(1), epicId));
-        int taskId2 = taskManager.addTask(new Task("Test task #2", "Test task #2", 
+        int taskId2 = taskManager.addTask(new Task("Test task #2", "Test task #2",
                 TEST_START_TIME.plusDays(2), Duration.ofDays(1)));
         int subtaskId2 = taskManager.addSubtask(new Subtask("Test subtask #1", "desc",
                 TEST_START_TIME.plusDays(3), Duration.ofDays(1), epicId));
-     
+
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/prioritized"))

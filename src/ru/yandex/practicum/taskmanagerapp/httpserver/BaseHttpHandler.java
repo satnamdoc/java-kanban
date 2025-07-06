@@ -39,7 +39,5 @@ abstract class BaseHttpHandler implements HttpHandler {
         h.sendResponseHeaders(200, 0);
         h.close();
     }
-
-
 }
 

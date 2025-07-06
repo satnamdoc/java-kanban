@@ -22,12 +22,12 @@ public class HttpTaskServer {
             .registerTypeAdapter(Duration.class, new DurationTypeAdapter())
             .create();
 
-    public HttpTaskServer(TaskManager taskManager)  throws IOException {
+    public HttpTaskServer(TaskManager taskManager) throws IOException {
         this.taskManager = taskManager;
         init();
     }
 
-    public void init() throws IOException{
+    public void init() throws IOException {
         httpServer = HttpServer.create(new InetSocketAddress(TCP_PORT), 0);
         httpServer.createContext("/tasks", new TaskHandler(taskManager));
         httpServer.createContext("/epics", new EpicHandler(taskManager));
