@@ -18,7 +18,8 @@ abstract class ItemHandler extends BaseHttpHandler {
         UNKNOWN
     }
 
-    protected static final String ID_TEMPLATE = """
+    protected static final String ID_TEMPLATE =
+    """
     {
       "id": %d
     }
