@@ -2,6 +2,7 @@ package ru.yandex.practicum.taskmanagerapp.httpserver;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
+import ru.yandex.practicum.taskmanagerapp.exception.BadJsonException;
 import ru.yandex.practicum.taskmanagerapp.exception.InconsistentDataException;
 import ru.yandex.practicum.taskmanagerapp.exception.NotFoundException;
 import ru.yandex.practicum.taskmanagerapp.exception.TimeConflictException;
@@ -9,11 +10,10 @@ import ru.yandex.practicum.taskmanagerapp.task.Epic;
 import ru.yandex.practicum.taskmanagerapp.taskmanager.TaskManager;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 public class EpicHandler extends ItemHandler {
-    TaskManager taskManager;
+    private TaskManager taskManager;
 
     public EpicHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
@@ -34,13 +34,11 @@ public class EpicHandler extends ItemHandler {
                     sendText(exchange, gson.toJson(taskManager.getEpicList()));
                 }
                 case ADD_ITEM -> {
-                    String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-                    Epic epic = gson.fromJson(body, Epic.class);
-                    sendText(exchange, "{\"id\":" + taskManager.addEpic(epic) + "}");
+                    Epic epic = deserializeItem(exchange, Epic.class);
+                    sendText(exchange, ID_TEMPLATE.formatted(taskManager.addEpic(epic)));
                 }
                 case UPDATE_ITEM -> {
-                    String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-                    Epic epic = gson.fromJson(body, Epic.class);
+                    Epic epic = deserializeItem(exchange, Epic.class);
                     if (epic.getId() != 0 && epic.getId() != optItemId.get()) {
                         sendBadRequest(exchange);
                     } else {
@@ -61,6 +59,8 @@ public class EpicHandler extends ItemHandler {
             sendNotFound(exchange);
         } catch (TimeConflictException | InconsistentDataException e) {
             sendHasOverlaps(exchange);
+        } catch (BadJsonException e) {
+            sendBadRequest(exchange);
         } catch (Exception e) {
             sendInternalError(exchange);
         }

@@ -2,7 +2,7 @@ package ru.yandex.practicum.taskmanagerapp.taskmanager;
 
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.taskmanagerapp.exception.*;
-import ru.yandex.practicum.taskmanagerapp.exception.NullPointerException;
+import ru.yandex.practicum.taskmanagerapp.exception.NullItemException;
 import ru.yandex.practicum.taskmanagerapp.task.Epic;
 import ru.yandex.practicum.taskmanagerapp.task.Subtask;
 import ru.yandex.practicum.taskmanagerapp.task.Task;
@@ -61,14 +61,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void shouldNotAddNullTaskObject() {
-        assertThrows(NullPointerException.class, () -> taskManager.addTask(null),
+        assertThrows(NullItemException.class, () -> taskManager.addTask(null),
                 "Should throw exception for null task");
         assertTrue(taskManager.getTaskList().isEmpty(), "Task list should be empty");
     }
 
     @Test
     public void shouldNotAddNullEpicObject() {
-        assertThrows(NullPointerException.class, () -> taskManager.addEpic(null),
+        assertThrows(NullItemException.class, () -> taskManager.addEpic(null),
                 "Should throw exception for null epic");
         assertTrue(taskManager.getEpicList().isEmpty(), "Epic list should be empty");
     }
@@ -84,7 +84,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void shouldNotAddNullSubtaskObject() {
-        assertThrows(NullPointerException.class, () -> taskManager.addSubtask(null),
+        assertThrows(NullItemException.class, () -> taskManager.addSubtask(null),
                 "Should throw exception for null subtask");
         assertTrue(taskManager.getSubtaskList().isEmpty(), "Subtask list should be empty");
     }
@@ -101,7 +101,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void shouldNotUpdateNullTaskObject() {
-        assertThrows(NullPointerException.class, () -> taskManager.updateTask(null),
+        assertThrows(NullItemException.class, () -> taskManager.updateTask(null),
                 "Should throw exception for null task");
     }
 
@@ -128,7 +128,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void shouldNotUpdateNullEpicObject() {
-        assertThrows(NullPointerException.class, () -> taskManager.updateEpic(null),
+        assertThrows(NullItemException.class, () -> taskManager.updateEpic(null),
                 "Should throw exception for null epic");
     }
 
@@ -151,7 +151,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void shouldNotUpdateNullSubtaskObject() {
-        assertThrows(NullPointerException.class, () -> taskManager.updateSubtask(null),
+        assertThrows(NullItemException.class, () -> taskManager.updateSubtask(null),
                 "Should throw exception for null subtask");
     }
 

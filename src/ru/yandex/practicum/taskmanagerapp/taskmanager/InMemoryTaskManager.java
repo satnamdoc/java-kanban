@@ -1,7 +1,7 @@
 package ru.yandex.practicum.taskmanagerapp.taskmanager;
 
 import ru.yandex.practicum.taskmanagerapp.exception.*;
-import ru.yandex.practicum.taskmanagerapp.exception.NullPointerException;
+import ru.yandex.practicum.taskmanagerapp.exception.NullItemException;
 import ru.yandex.practicum.taskmanagerapp.history.HistoryManager;
 import ru.yandex.practicum.taskmanagerapp.task.Epic;
 import ru.yandex.practicum.taskmanagerapp.task.Subtask;
@@ -51,7 +51,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int addTask(Task task) {
         if (task == null) {
-            throw new NullPointerException();
+            throw new NullItemException();
         }
         if (isTimeConflictQ(task)) {
             throw new TimeConflictException();
@@ -69,7 +69,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int addEpic(Epic epic) {
         if (epic == null) {
-            throw new NullPointerException();
+            throw new NullItemException();
         }
         if (!epic.getSubtaskIds().isEmpty()) {
             throw new InconsistentDataException();
@@ -83,7 +83,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int addSubtask(Subtask subtask) {
         if (subtask == null) {
-            throw new NullPointerException();
+            throw new NullItemException();
         }
         if (!epics.containsKey(subtask.getEpicId())) {
             throw new InconsistentDataException();
@@ -106,7 +106,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task updateTask(Task task) {
         if (task == null) {
-            throw new NullPointerException();
+            throw new NullItemException();
         }
         Task oldTask = tasks.get(task.getId());
         if (oldTask == null) {
@@ -132,7 +132,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic updateEpic(Epic epic) {
         if (epic == null) {
-            throw new NullPointerException();
+            throw new NullItemException();
         }
         if (epics.replace(epic.getId(), epic) == null) {
             throw new NotFoundException();
@@ -143,7 +143,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Subtask updateSubtask(Subtask subtask) {
         if (subtask == null) {
-            throw new NullPointerException();
+            throw new NullItemException();
         }
         Subtask oldSubtask;
         if ((oldSubtask = subtasks.get(subtask.getId())) == null) {

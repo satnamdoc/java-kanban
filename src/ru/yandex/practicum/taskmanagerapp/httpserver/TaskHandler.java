@@ -2,6 +2,7 @@ package ru.yandex.practicum.taskmanagerapp.httpserver;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
+import ru.yandex.practicum.taskmanagerapp.exception.BadJsonException;
 import ru.yandex.practicum.taskmanagerapp.exception.InconsistentDataException;
 import ru.yandex.practicum.taskmanagerapp.exception.NotFoundException;
 import ru.yandex.practicum.taskmanagerapp.exception.TimeConflictException;
@@ -9,11 +10,10 @@ import ru.yandex.practicum.taskmanagerapp.task.Task;
 import ru.yandex.practicum.taskmanagerapp.taskmanager.TaskManager;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 public class TaskHandler extends ItemHandler {
-    TaskManager taskManager;
+    private final TaskManager taskManager;
 
     public TaskHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
@@ -34,13 +34,11 @@ public class TaskHandler extends ItemHandler {
                     sendText(exchange, gson.toJson(taskManager.getTaskList()));
                 }
                 case ADD_ITEM -> {
-                    String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-                    Task task = gson.fromJson(body, Task.class);
-                    sendText(exchange, "{\"id\":" + taskManager.addTask(task) + "}");
+                    Task task = deserializeItem(exchange, Task.class);
+                    sendText(exchange, ID_TEMPLATE.formatted(taskManager.addTask(task)));
                 }
                 case UPDATE_ITEM -> {
-                    String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-                    Task task = gson.fromJson(body, Task.class);
+                    Task task = deserializeItem(exchange, Task.class);
                     if (task.getId() != 0 && task.getId() != optItemId.get()) {
                         sendBadRequest(exchange);
                     } else {
@@ -61,6 +59,8 @@ public class TaskHandler extends ItemHandler {
             sendNotFound(exchange);
         } catch (TimeConflictException | InconsistentDataException e) {
             sendHasOverlaps(exchange);
+        } catch (BadJsonException e) {
+            sendBadRequest(exchange);
         } catch (Exception e) {
             sendInternalError(exchange);
         }

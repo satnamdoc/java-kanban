@@ -1,13 +1,10 @@
 package ru.yandex.practicum.taskmanagerapp.httpserver;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import ru.yandex.practicum.taskmanagerapp.taskmanager.TaskManager;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalDateTime;
 
 public class HistoryHandler extends BaseHttpHandler {
     private final TaskManager taskManager;
@@ -25,10 +22,7 @@ public class HistoryHandler extends BaseHttpHandler {
             sendBadRequest(exchange);
         }
 
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
-                .registerTypeAdapter(Duration.class, new DurationTypeAdapter())
-                .create();
+        Gson gson = HttpTaskServer.getGson();
         sendText(exchange, gson.toJson(taskManager.getHistory()));
     }
 }

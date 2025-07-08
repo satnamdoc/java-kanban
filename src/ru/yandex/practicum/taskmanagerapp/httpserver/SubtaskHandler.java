@@ -2,6 +2,7 @@ package ru.yandex.practicum.taskmanagerapp.httpserver;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
+import ru.yandex.practicum.taskmanagerapp.exception.BadJsonException;
 import ru.yandex.practicum.taskmanagerapp.exception.InconsistentDataException;
 import ru.yandex.practicum.taskmanagerapp.exception.NotFoundException;
 import ru.yandex.practicum.taskmanagerapp.exception.TimeConflictException;
@@ -9,11 +10,10 @@ import ru.yandex.practicum.taskmanagerapp.task.Subtask;
 import ru.yandex.practicum.taskmanagerapp.taskmanager.TaskManager;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 public class SubtaskHandler extends ItemHandler {
-    TaskManager taskManager;
+    private final TaskManager taskManager;
 
     public SubtaskHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
@@ -34,13 +34,11 @@ public class SubtaskHandler extends ItemHandler {
                     sendText(exchange, gson.toJson(taskManager.getSubtaskList()));
                 }
                 case ADD_ITEM -> {
-                    String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-                    Subtask subtask = gson.fromJson(body, Subtask.class);
-                    sendText(exchange, "{\"id\":" + taskManager.addSubtask(subtask) + "}");
+                    Subtask subtask = deserializeItem(exchange, Subtask.class);
+                    sendText(exchange, ID_TEMPLATE.formatted(taskManager.addSubtask(subtask)));
                 }
                 case UPDATE_ITEM -> {
-                    String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-                    Subtask subtask = gson.fromJson(body, Subtask.class);
+                    Subtask subtask = deserializeItem(exchange, Subtask.class);
                     if (subtask.getId() != 0 && subtask.getId() != optItemId.get()) {
                         sendBadRequest(exchange);
                     } else {
@@ -61,6 +59,8 @@ public class SubtaskHandler extends ItemHandler {
             sendNotFound(exchange);
         } catch (TimeConflictException | InconsistentDataException e) {
             sendHasOverlaps(exchange);
+        } catch (BadJsonException e) {
+            sendBadRequest(exchange);
         } catch (Exception e) {
             sendInternalError(exchange);
         }

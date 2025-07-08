@@ -2,6 +2,7 @@ package ru.yandex.practicum.taskmanagerapp.httpserver;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
@@ -15,6 +16,10 @@ public class DurationTypeAdapter extends TypeAdapter<Duration> {
 
     @Override
     public Duration read(final JsonReader jsonReader) throws IOException {
-        return Duration.ofMinutes(jsonReader.nextInt());
+        if (jsonReader.peek() == JsonToken.NULL) {
+            jsonReader.nextNull();
+            return Duration.ZERO;
+        }
+        return Duration.ofMinutes(jsonReader.nextLong());
     }
 }

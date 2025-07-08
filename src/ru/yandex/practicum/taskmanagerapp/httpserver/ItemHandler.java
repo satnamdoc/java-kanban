@@ -1,7 +1,11 @@
 package ru.yandex.practicum.taskmanagerapp.httpserver;
 
 import com.sun.net.httpserver.HttpExchange;
+import ru.yandex.practicum.taskmanagerapp.exception.BadJsonException;
+import ru.yandex.practicum.taskmanagerapp.task.Task;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 abstract class ItemHandler extends BaseHttpHandler {
@@ -13,6 +17,12 @@ abstract class ItemHandler extends BaseHttpHandler {
         DELETE_ITEM,
         UNKNOWN
     }
+
+    protected static final String ID_TEMPLATE = """
+    {
+      "id": %d
+    }
+    """;
 
     protected static Endpoint getEndpoint(HttpExchange exchange) {
         String method = exchange.getRequestMethod();
@@ -34,9 +44,8 @@ abstract class ItemHandler extends BaseHttpHandler {
                 case "DELETE" -> Endpoint.DELETE_ITEM;
                 default -> Endpoint.UNKNOWN;
             };
-        } else {
-            return Endpoint.UNKNOWN;
         }
+        return Endpoint.UNKNOWN;
     }
 
     protected static Optional<Integer> getItemId(HttpExchange exchange) {
@@ -45,6 +54,15 @@ abstract class ItemHandler extends BaseHttpHandler {
             return Optional.of(Integer.parseInt(pathParts[2]));
         } catch (Exception e) {
             return Optional.empty();
+        }
+    }
+
+    protected static <T extends Task> T deserializeItem(HttpExchange exchange, Class<T> itemClass) throws IOException {
+        String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+        try {
+            return HttpTaskServer.getGson().fromJson(body, itemClass);
+        } catch (Exception e) {
+            throw new BadJsonException();
         }
     }
 }
