@@ -18,12 +18,7 @@ abstract class ItemHandler extends BaseHttpHandler {
         UNKNOWN
     }
 
-    protected static final String ID_TEMPLATE =
-    """
-    {
-      "id": %d
-    }
-    """;
+    protected static final String ID_TEMPLATE = "{\"id\":%d}";
 
     protected static Endpoint getEndpoint(HttpExchange exchange) {
         String method = exchange.getRequestMethod();
