@@ -1,6 +1,7 @@
 package ru.yandex.practicum.taskmanagerapp.taskmanager;
 
-import ru.yandex.practicum.taskmanagerapp.exception.ManagerLoadException;
+import ru.yandex.practicum.taskmanagerapp.exception.*;
+import ru.yandex.practicum.taskmanagerapp.exception.NullItemException;
 import ru.yandex.practicum.taskmanagerapp.history.HistoryManager;
 import ru.yandex.practicum.taskmanagerapp.task.Epic;
 import ru.yandex.practicum.taskmanagerapp.task.Subtask;
@@ -29,11 +30,15 @@ public class InMemoryTaskManager implements TaskManager {
     private final TreeSet<? super Task> tasksSortedByStartTime =
             new TreeSet<>(Comparator.comparing(
                     t -> t.getStartTime()
-                            .orElseThrow(() -> new NullPointerException("Start time attribute is null"))
+                            .orElseThrow(() -> new java.lang.NullPointerException("Start time attribute is null"))
             )
             );
     // Structure stores 1-hour intervals and task ids
     private final HashMap<Long, HashSet<Integer>> taskSchedule = new HashMap<>();
+
+    public InMemoryTaskManager() {
+        this.historyManager = Managers.getDefaultHistory();
+    }
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         this.historyManager = historyManager;
@@ -45,8 +50,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int addTask(Task task) {
-        if (task == null || isTimeConflictQ(task)) {
-            return Task.NULL_ID;
+        if (task == null) {
+            throw new NullItemException();
+        }
+        if (isTimeConflictQ(task)) {
+            throw new TimeConflictException();
         }
         int id = generateId();
         task.setId(id);
@@ -60,9 +68,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int addEpic(Epic epic) {
-        if (epic == null
-                || !epic.getSubtaskIds().isEmpty()) {
-            return Task.NULL_ID;
+        if (epic == null) {
+            throw new NullItemException();
+        }
+        if (!epic.getSubtaskIds().isEmpty()) {
+            throw new InconsistentDataException();
         }
         int id = generateId();
         epic.setId(id);
@@ -72,10 +82,14 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int addSubtask(Subtask subtask) {
-        if (subtask == null
-                || !epics.containsKey(subtask.getEpicId())
-                || isTimeConflictQ(subtask)) {
-            return Task.NULL_ID;
+        if (subtask == null) {
+            throw new NullItemException();
+        }
+        if (!epics.containsKey(subtask.getEpicId())) {
+            throw new InconsistentDataException();
+        }
+        if (isTimeConflictQ(subtask)) {
+            throw new TimeConflictException();
         }
         int id = generateId();
         subtask.setId(id);
@@ -92,16 +106,16 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task updateTask(Task task) {
         if (task == null) {
-            return null;
+            throw new NullItemException();
         }
         Task oldTask = tasks.get(task.getId());
         if (oldTask == null) {
-            return null;
+            throw new NotFoundException();
         }
         removeFromTaskShedule(oldTask);
         if (isTimeConflictQ(task)) {
             addToTaskShedule(oldTask);
-            return null;
+            throw new TimeConflictException();
         }
 
         tasks.replace(task.getId(), task);
@@ -117,23 +131,29 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Epic updateEpic(Epic epic) {
-        if (epic == null || epics.replace(epic.getId(), epic) == null) {
-            return null;
+        if (epic == null) {
+            throw new NullItemException();
+        }
+        if (epics.replace(epic.getId(), epic) == null) {
+            throw new NotFoundException();
         }
         return updateEpicInternalState(epic);
     }
 
     @Override
     public Subtask updateSubtask(Subtask subtask) {
+        if (subtask == null) {
+            throw new NullItemException();
+        }
         Subtask oldSubtask;
-        if (subtask == null || (oldSubtask = subtasks.get(subtask.getId())) == null) {
-            return null;
+        if ((oldSubtask = subtasks.get(subtask.getId())) == null) {
+            throw new NotFoundException();
         }
 
         removeFromTaskShedule(oldSubtask);
         if (isTimeConflictQ(subtask)) {
             addToTaskShedule(oldSubtask);
-            return null;
+            throw new TimeConflictException();
         }
 
         subtasks.replace(subtask.getId(), subtask);
@@ -165,7 +185,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Subtask> getEpicSubtasks(int epicId) {
         if (!epics.containsKey(epicId)) {
-            return null;
+            throw new NotFoundException();
         }
 
         ArrayList<Subtask> subtasksOfEpic = new ArrayList<>();
@@ -211,68 +231,69 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Optional<Task> getTask(int id) {
+    public Task getTask(int id) {
         Task task = tasks.get(id);
-        if (task != null) {
-            historyManager.add(task);
+        if (task == null) {
+            throw new NotFoundException();
         }
-        return Optional.ofNullable(task);
+        historyManager.add(task);
+        return task;
     }
 
     @Override
-    public Optional<Epic> getEpic(int id) {
+    public Epic getEpic(int id) {
         Epic epic = epics.get(id);
-        if (epic != null) {
-            historyManager.add(epic);
+        if (epic == null) {
+            throw new NotFoundException();
         }
-        return Optional.ofNullable(epic);
+        historyManager.add(epic);
+        return epic;
     }
 
     @Override
-    public Optional<Subtask> getSubtask(int id) {
+    public Subtask getSubtask(int id) {
         Subtask subtask = subtasks.get(id);
-        if (subtask != null) {
-            historyManager.add(subtask);
+        if (subtask == null) {
+            throw new NotFoundException();
         }
-        return Optional.ofNullable(subtask);
+        historyManager.add(subtask);
+        return subtask;
     }
 
     @Override
-    public boolean removeTask(int id) {
+    public Task removeTask(int id) {
         historyManager.remove(id);
         Task task = tasks.remove(id);
         if (task == null)
-            return false;
+            throw new NotFoundException();
         tasksSortedByStartTime.remove(task);
         removeFromTaskShedule(task);
-        return true;
+        return task;
     }
 
     @Override
-    public boolean removeEpic(int id) {
+    public Epic removeEpic(int id) {
         if (!epics.containsKey(id)) {
-            return false;
+            throw new NotFoundException();
         }
         epics.get(id).getSubtaskIds().forEach(this::removeSubtask);
-        epics.remove(id);
         historyManager.remove(id);
-        return true;
+        return epics.remove(id);
     }
 
     @Override
-    public boolean removeSubtask(int id) {
+    public Subtask removeSubtask(int id) {
         Subtask subtask = subtasks.get(id);
         if (subtask == null) {
-            return false;
+            throw new NotFoundException();
         }
         Epic bindingEpic = epics.get(subtask.getEpicId());
         bindingEpic.removeSubtask(id);
         updateEpicInternalState(bindingEpic);
-        subtasks.remove(id);
         tasksSortedByStartTime.remove(subtask);
         removeFromTaskShedule(subtask);
         historyManager.remove(id);
-        return true;
+        return subtasks.remove(id);
     }
 
     private Epic updateEpicStatus(Epic epic) {

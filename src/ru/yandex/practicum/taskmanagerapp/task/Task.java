@@ -3,6 +3,7 @@ package ru.yandex.practicum.taskmanagerapp.task;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -23,8 +24,8 @@ public class Task {
         this.name = name;
         this.description = description;
         this.status = TaskStatus.NEW;
-        this.startTime = startTime;
-        this.duration = duration;
+        this.startTime = (startTime != null) ? startTime.truncatedTo(ChronoUnit.MINUTES) : null;
+        this.duration = duration == null ? Duration.ZERO : duration.truncatedTo(ChronoUnit.MINUTES);
     }
 
     public Task(int id, String name, String description, TaskStatus status,
@@ -33,8 +34,8 @@ public class Task {
         this.name = name;
         this.description = description;
         this.status = status;
-        this.startTime = startTime;
-        this.duration = duration == null ? Duration.ZERO : duration;
+        this.startTime = (startTime != null) ? startTime.truncatedTo(ChronoUnit.MINUTES) : null;
+        this.duration = duration == null ? Duration.ZERO : duration.truncatedTo(ChronoUnit.MINUTES);
     }
 
     public int getId() {

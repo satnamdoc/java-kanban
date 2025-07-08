@@ -53,9 +53,9 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
                 TEST_START_TIME.plus(TEST_DURATION), TEST_DURATION, epicId));
 
         String fileData = CSVFILE_HEADER + "\n" +
-                taskId + ",TASK,NEW,Test task,description,01.01.2025 00:00,1501,\n" +
-                epicId + ",EPIC,NEW,Test epic,description,02.01.2025 01:01,1501,\n" +
-                subtaskId + ",SUBTASK,NEW,Test subtask,description,02.01.2025 01:01,1501," + epicId + "\n";
+                taskId + ",TASK,NEW,Test task,description,01.01.2025 00:00,1440,\n" +
+                epicId + ",EPIC,NEW,Test epic,description,02.01.2025 00:00,1440,\n" +
+                subtaskId + ",SUBTASK,NEW,Test subtask,description,02.01.2025 00:00,1440," + epicId + "\n";
         assertEquals(fileData, Files.readString(Paths.get(tempFile.getAbsolutePath())),
                 "Data file corruption");
     }
